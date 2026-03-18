@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Tempest — Secure File Sharing with Self-Destruct Links{% endblock %}
+{% block title %}Tempest{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -133,12 +133,32 @@
     <p class="section-sub" style="margin:10px auto 0;">Everything you need to know about Tempest.</p>
   </div>
   <div class="faq-item">
-    <button class="faq-q" onclick="toggleFaq(this)">How does the one-time download work?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
-    <div class="faq-a">When a file is downloaded, the SharedFile model sets <code>downloaded=True</code>. The <code>is_expired()</code> method returns True, and all subsequent requests return a 410. The link is permanently invalid after first use.</div>
+    <button class="faq-q" onclick="toggleFaq(this)">How do download limits work?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">When uploading, you can set a download limit (from 1 to 100). Tempest tracks the <code>download_count</code>, and once it reaches your specified limit, the link is permanently invalidated (410 Gone).</div>
   </div>
   <div class="faq-item">
     <button class="faq-q" onclick="toggleFaq(this)">How is encryption handled?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
     <div class="faq-a">Encryption is optional and uses the Python <code>cryptography</code> library with AES-256 (Fernet). A unique key is generated per file, stored in the DB, and used to decrypt on-the-fly when the file is served.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">What is the maximum file size?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">You can upload files up to 100MB. We also restrict certain executable file types (.exe, .bat, .sh, .bin, .cmd, .msi) for security reasons.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">How long do links last?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">You can choose an expiry period ranging from 1 hour to 1 month. After this time, the file and all associated metadata are permanently deleted from our storage and database.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">What happens if I enter the wrong password?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">You have 3 attempts to enter the correct password. If all 3 attempts fail, the file is instantly destroyed to prevent brute-force attacks.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">Is the data really gone after deletion?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">Yes. When a file expires or is deleted (manually or via failed password attempts), it is purged from our Cloudflare R2 storage and the database record is removed. There is no way to recover it.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">Can I use Tempest via API?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">Yes! Tempest is built with a REST API first approach. Check out the <a href="{% url 'api_reference' %}">API Reference</a> for more details and documentation.</div>
   </div>
 </section>
 

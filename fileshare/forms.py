@@ -12,16 +12,23 @@ EXPIRY_CHOICES = [
     (720, '1 Month'),
 ]
 
-MAX_FILE_SIZE = 50 * 1024 * 1024
+MAX_FILE_SIZE = 100 * 1024 * 1024
+DOWNLOAD_CHOICES = [
+    (1, '1 Download'),
+    (5, '5 Downloads'),
+    (10, '10 Downloads'),
+    (100, '100 Downloads'),
+]
 
 class UploadForm(forms.ModelForm):
     expires_in_hours = forms.ChoiceField(choices=EXPIRY_CHOICES, initial=24, label="Expires In")
+    max_downloads = forms.ChoiceField(choices=DOWNLOAD_CHOICES, initial=1, label="Max Downloads")
     password = forms.CharField(widget=forms.PasswordInput(), required=False, help_text="Optional: Protect file with a password")
     encrypt = forms.BooleanField(required=False, initial=True, label="Encrypt File", help_text="Enable End-to-End Encryption (AES-256)")
 
     class Meta:
         model = SharedFile
-        fields = ['file', 'password']
+        fields = ['file', 'password', 'max_downloads']
         
     def clean_file(self):
         file = self.cleaned_data.get('file')

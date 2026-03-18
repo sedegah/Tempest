@@ -207,8 +207,8 @@ def perform_download(request, token, original_uuid):
 
         response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_name)}"'
         
-        # Mark as downloaded (one-time logic)
-        DBInterface.mark_as_downloaded(shared_file)
+        # Increment download count (multi-download logic)
+        DBInterface.increment_download_count(shared_file)
         
         # Log the final download success
         AccessLog.objects.create(

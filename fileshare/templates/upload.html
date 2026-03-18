@@ -511,7 +511,7 @@
           <div class="card-header-icon"><i data-lucide="file-up" class="icon"></i></div>
           <div>
             <div class="card-header-title">Select File</div>
-            <div class="card-header-sub">Any file type up to 50 MB</div>
+            <div class="card-header-sub">Any file type up to 100 MB</div>
           </div>
         </div>
         <div class="card-body">
@@ -543,12 +543,22 @@
         <div class="card-body">
           <div class="field">
             <label class="field-label"><i data-lucide="timer" class="icon"></i> Link Expiry</label>
-            <div class="seg-group">
+            <div class="seg-group" id="expiryGroup">
               <button type="button" class="seg-btn" data-hours="1">1 hr<span>Hourly</span></button>
               <button type="button" class="seg-btn active" data-hours="24">24 hrs<span>Default</span></button>
               <button type="button" class="seg-btn" data-hours="72">72 hrs<span>3 days</span></button>
               <button type="button" class="seg-btn" data-hours="168">7 days<span>Weekly</span></button>
             </div>
+          </div>
+          <div class="field">
+            <label class="field-label"><i data-lucide="download" class="icon"></i> Download Limit</label>
+            <div class="seg-group" id="downloadGroup">
+              <button type="button" class="seg-btn active" data-downloads="1">1<span>Single Use</span></button>
+              <button type="button" class="seg-btn" data-downloads="5">5<span>Small Group</span></button>
+              <button type="button" class="seg-btn" data-downloads="10">10<span>Team</span></button>
+              <button type="button" class="seg-btn" data-downloads="100">100<span>Public</span></button>
+            </div>
+            <input type="hidden" name="max_downloads" id="maxDownloadsHidden" value="1" />
           </div>
           <div class="field">
             <label class="field-label"><i data-lucide="lock" class="icon"></i> Encryption</label>
@@ -620,12 +630,21 @@
       fileInput.click();
     });
 
-    document.querySelectorAll('.seg-btn').forEach(btn => {
+    document.querySelectorAll('#expiryGroup .seg-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent triggering dropzone click
-        document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        e.stopPropagation();
+        document.querySelectorAll('#expiryGroup .seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('expiryHidden').value = btn.dataset.hours;
+      });
+    });
+
+    document.querySelectorAll('#downloadGroup .seg-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('#downloadGroup .seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('maxDownloadsHidden').value = btn.dataset.downloads;
       });
     });
 

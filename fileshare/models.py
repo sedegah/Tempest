@@ -7,12 +7,13 @@ class SharedFile(models.Model):
     file = models.FileField(upload_to='uploads/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
-    downloaded = models.BooleanField(default=False)
+    max_downloads = models.PositiveIntegerField(default=1)
+    download_count = models.PositiveIntegerField(default=0)
     encryption_key = models.CharField(max_length=128, blank=True, null=True)
     password = models.CharField(max_length=256, blank=True, null=True)
 
     def is_expired(self):
-        return timezone.now() > self.expires_at or self.downloaded
+        return timezone.now() > self.expires_at or self.download_count >= self.max_downloads
 
     def __str__(self):
         return f"File {self.token} (Expires: {self.expires_at})"

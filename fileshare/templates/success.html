@@ -55,7 +55,7 @@
         <div class="success-ring"><i data-lucide="check" class="icon"></i></div>
         <div>
           <div class="success-title">Link <em>Generated.</em></div>
-          <p style="color:var(--muted);font-size:14px;margin-top:4px;">File uploaded, encrypted, and ready to share. It self-destructs after one download.</p>
+          <p style="color:var(--muted);font-size:14px;margin-top:4px;">File uploaded, encrypted, and ready to share. It self-destructs after reaching the download limit.</p>
         </div>
       </div>
 
@@ -75,7 +75,7 @@
           <div class="detail-grid">
             <div class="detail-cell"><div class="detail-label">File</div><div class="detail-value" style="word-break:break-all;">{{ file.file.name }}</div></div>
             <div class="detail-cell"><div class="detail-label">Encryption</div><div class="detail-value">{% if file.encryption_key %}AES-256{% else %}None{% endif %}</div></div>
-            <div class="detail-cell"><div class="detail-label">Downloads</div><div class="detail-value" style="color:var(--accent);">0 / 1</div></div>
+            <div class="detail-cell"><div class="detail-label">Downloads</div><div class="detail-value" style="color:var(--accent);">{{ file.download_count }} / {{ file.max_downloads }}</div></div>
             <div class="detail-cell"><div class="detail-label">Password</div><div class="detail-value">{% if file.password %}Protected{% else %}Open{% endif %}</div></div>
           </div>
         </div>

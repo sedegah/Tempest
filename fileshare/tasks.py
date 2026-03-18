@@ -5,7 +5,8 @@ from .interfaces import StorageInterface, DBInterface
 
 @shared_task
 def delete_expired_files():
-    expired_files = SharedFile.objects.filter(downloaded=True) | SharedFile.objects.filter(expires_at__lt=timezone.now())
+    from django.db.models import F
+    expired_files = SharedFile.objects.filter(download_count__gte=F('max_downloads')) | SharedFile.objects.filter(expires_at__lt=timezone.now())
     
     deleted_count = 0
     for file_record in expired_files:

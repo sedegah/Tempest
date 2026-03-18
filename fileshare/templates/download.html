@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Download File — Tempest{% endblock %}
+{% block title %}Download File{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -34,7 +34,7 @@
         <span><i data-lucide="lock" class="icon"></i> AES-256</span>
       </div>
       <div style="width:100%; height:1px; background:var(--border); margin:10px 0;"></div>
-      <p style="color:var(--muted); font-size:14px; line-height:1.6;">Your secure file is ready for download. Note that this link may expire or be limited to a single download as per the sender's configuration.</p>
+      <p style="color:var(--muted); font-size:14px; line-height:1.6;">Your secure file is ready for download. Note that this link may expire or be limited to a set number of downloads as per the uploader's configuration.</p>
       
       <a href="{% url 'perform_download' token=token original_uuid=original_uuid %}" class="btn btn-primary btn-download">
         <i data-lucide="download" class="icon" style="width:18px;height:18px"></i> Download Now
@@ -42,7 +42,7 @@
       
       <div class="expiry-notice">
         <i data-lucide="timer" class="icon" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px;"></i> 
-        Self-destructs after download or on {{ shared_file.expires_at|date:"M d, H:i" }}
+        Self-destructs after {{ shared_file.max_downloads }} download{{ shared_file.max_downloads|pluralize }} or on {{ shared_file.expires_at|date:"M d, H:i" }}
       </div>
     </div>
   </div>

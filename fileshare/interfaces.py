@@ -76,9 +76,9 @@ class DBInterface:
             return None
 
     @staticmethod
-    def mark_as_downloaded(shared_file):
-        shared_file.downloaded = True
-        shared_file.save(update_fields=['downloaded'])
+    def increment_download_count(shared_file):
+        shared_file.download_count += 1
+        shared_file.save(update_fields=['download_count'])
         return shared_file
 
     @staticmethod
