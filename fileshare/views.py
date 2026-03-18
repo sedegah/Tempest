@@ -79,6 +79,7 @@ def upload_view(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             shared_file = form.save(commit=False)
+            shared_file.original_name = request.FILES['file'].name
             
             raw_password = form.cleaned_data.get('password')
             if raw_password:

@@ -5,6 +5,7 @@ from django.utils import timezone
 class SharedFile(models.Model):
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     file = models.FileField(upload_to='uploads/')
+    original_name = models.CharField(max_length=255, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     max_downloads = models.PositiveIntegerField(default=1)
@@ -14,6 +15,11 @@ class SharedFile(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.expires_at or self.download_count >= self.max_downloads
+
+    @property
+    def display_name(self):
+        import os
+        return self.original_name or os.path.basename(self.file.name)
 
     def __str__(self):
         return f"File {self.token} (Expires: {self.expires_at})"
