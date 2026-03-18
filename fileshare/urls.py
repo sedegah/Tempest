@@ -8,6 +8,7 @@ urlpatterns = [
     path('tech-stack/', views.tech_stack_view, name='tech_stack'),
     path('upload/', views.upload_view, name='upload'),
     path('success/<str:token>/<uuid:original_uuid>/', views.success_view, name='success'),
+    path('status-api/<str:token>/<uuid:original_uuid>/', views.file_status_view, name='status_api'),
     path('download/<str:token>/<uuid:original_uuid>/', views.download_view, name='download'),
     path('perform-download/<str:token>/<uuid:original_uuid>/', views.perform_download, name='perform_download'),
     path('privacy/', views.privacy_view, name='privacy'),

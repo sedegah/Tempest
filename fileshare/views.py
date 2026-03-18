@@ -1,7 +1,7 @@
 import os
 import hashlib
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.conf import settings
 from cryptography.fernet import Fernet
 from .models import SharedFile, AccessLog
@@ -9,6 +9,18 @@ from .forms import UploadForm
 from .interfaces import StorageInterface, DBInterface
 from django.contrib.auth.hashers import make_password, check_password
 from django_ratelimit.decorators import ratelimit
+
+def file_status_view(request, token, original_uuid):
+    shared_file = get_object_or_404(SharedFile, token=original_uuid)
+    expected_token = get_obfuscated_token(shared_file.token)
+    if token != expected_token:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    return JsonResponse({
+        'downloaded': shared_file.downloaded,
+        'is_expired': shared_file.is_expired(),
+        'expires_at_iso': shared_file.expires_at.isoformat(),
+    })
 
 def landing_view(request):
     return render(request, 'landing.html')
