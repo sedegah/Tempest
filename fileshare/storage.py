@@ -31,17 +31,32 @@ class CloudflareR2Storage(Storage):
         return name
 
     def _open(self, name, mode='rb'):
+        public_url = os.environ.get('CLOUDFLARE_R2_PUBLIC_URL')
+        if public_url:
+            url = f"{public_url.rstrip('/')}/{name}"
+            res = requests.get(url)
+            if res.status_code == 200:
+                from django.core.files.base import ContentFile
+                return ContentFile(res.content, name=name)
+        
+        # Fallback to API if no Public URL or Public URL fails
         url = self._get_url(name)
         headers = {"Authorization": f"Bearer {self.token}"}
-        print(f"R2 GET: {url}")
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
-            print(f"R2 GET Error: {res.status_code} {res.text}")
-            raise Exception(f"R2 Download failed: {res.status_code} {res.text}")
+            raise Exception(f"R2 Download failed: {res.status_code} {res.text} at {url}")
         from django.core.files.base import ContentFile
         return ContentFile(res.content, name=name)
 
     def exists(self, name):
+        public_url = os.environ.get('CLOUDFLARE_R2_PUBLIC_URL')
+        if public_url:
+            url = f"{public_url.rstrip('/')}/{name}"
+            res = requests.head(url)
+            if res.status_code == 200:
+                return True
+        
+        # Fallback to API check
         url = self._get_url(name)
         headers = {
             "Authorization": f"Bearer {self.token}",
@@ -49,8 +64,6 @@ class CloudflareR2Storage(Storage):
         }
         res = requests.get(url, headers=headers)
         if res.status_code not in [200, 206] and settings.DEBUG:
-            # We'll store the last failed URL in the object for debugging if needed, 
-            # but better to just return it in the exception.
             self.last_failed_url = url
         return res.status_code in [200, 206]
 
