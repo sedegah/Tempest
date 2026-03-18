@@ -13,7 +13,7 @@ class CloudflareR2Storage(Storage):
         self.token = os.environ.get('CLOUDFLARE_R2_SECRET_ACCESS_KEY')
         self.endpoint = f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/r2/buckets/{self.bucket_name}/objects"
     def _get_url(self, name):
-        safe_name = urllib.parse.quote(name, safe='')
+        safe_name = urllib.parse.quote(name, safe='/')
         return f"{self.endpoint}/{safe_name}"
 
     def _save(self, name, content):

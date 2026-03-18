@@ -176,6 +176,8 @@ def perform_download(request, token, original_uuid):
         file_name = shared_file.file.name
         file_content = StorageInterface.get_file_content(file_name)
         if not file_content:
+            if settings.DEBUG:
+                raise Http404(f"File not found in storage: {file_name}")
             raise Http404("File not found in storage.")
 
         if shared_file.encryption_key:
