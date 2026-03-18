@@ -125,12 +125,6 @@ def download_view(request, token, original_uuid):
             pwd = request.POST.get('password', '')
             if not check_password(pwd, shared_file.password):
                 attempts += 1
-                # ... existing logic ...
-            else:
-                # Correct password
-                request.session[f'auth_ok_{original_uuid}'] = True
-                request.session.pop(f'pwd_attempts_{original_uuid}', None)
-                # Success - will proceed to render download.html
                 request.session[f'pwd_attempts_{original_uuid}'] = attempts
                 if attempts >= 3:
                     request.session.pop(f'pwd_attempts_{original_uuid}', None)
@@ -145,6 +139,11 @@ def download_view(request, token, original_uuid):
                     'token': token, 'original_uuid': original_uuid,
                     'shared_file': shared_file, 'panel': 'auth',
                 })
+            else:
+                # Correct password
+                request.session[f'auth_ok_{original_uuid}'] = True
+                request.session.pop(f'pwd_attempts_{original_uuid}', None)
+                # Success - will proceed to render download.html
         else:
             return render(request, 'download_auth.html', {
                 'token': token, 'original_uuid': original_uuid,

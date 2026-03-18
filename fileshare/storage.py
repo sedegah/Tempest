@@ -39,7 +39,6 @@ class CloudflareR2Storage(Storage):
                 from django.core.files.base import ContentFile
                 return ContentFile(res.content, name=name)
         
-        # Fallback to API if no Public URL or Public URL fails
         url = self._get_url(name)
         headers = {"Authorization": f"Bearer {self.token}"}
         res = requests.get(url, headers=headers)
@@ -56,7 +55,6 @@ class CloudflareR2Storage(Storage):
             if res.status_code == 200:
                 return True
         
-        # Fallback to API check
         url = self._get_url(name)
         headers = {
             "Authorization": f"Bearer {self.token}",

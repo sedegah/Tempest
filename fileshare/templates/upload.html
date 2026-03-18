@@ -597,23 +597,32 @@
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  function initUpload() {
     const fileInput = document.getElementById('id_file');
     const dropzone = document.getElementById('dropzone');
     const encSwitch = document.getElementById('id_encrypt');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!fileInput || !dropzone) return;
 
     fileInput.addEventListener('change', e => {
       if (e.target.files.length) {
         document.getElementById('fileName').textContent = e.target.files[0].name;
         document.getElementById('filePreview').classList.add('visible');
         dropzone.style.display = 'none';
-        document.getElementById('submitBtn').disabled = false;
+        submitBtn.disabled = false;
         updateScore();
       }
     });
 
+    // Robustness: ensure clicking the dropzone (even if input miss) triggers the input
+    dropzone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
     document.querySelectorAll('.seg-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering dropzone click
         document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('expiryHidden').value = btn.dataset.hours;
@@ -623,11 +632,26 @@
     function updateScore() {
       let score = 40;
       if (fileInput.files.length) score += 10;
-      if (encSwitch.checked) score += 25;
+      if (encSwitch && encSwitch.checked) score += 25;
       const circumference = 188;
-      document.getElementById('scoreFill').style.strokeDashoffset = circumference - (score / 100) * circumference;
-      document.getElementById('scoreNum').innerHTML = `${score}<span>/ 100</span>`;
+      const fill = document.getElementById('scoreFill');
+      if (fill) {
+        fill.style.strokeDashoffset = circumference - (score / 100) * circumference;
+      }
+      const num = document.getElementById('scoreNum');
+      if (num) {
+          num.innerHTML = `${score}<span>/ 100</span>`;
+      }
     }
-  });
+    
+    // Initial score check
+    updateScore();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUpload);
+  } else {
+    initUpload();
+  }
 </script>
 {% endblock %}
