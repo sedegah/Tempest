@@ -31,14 +31,14 @@
 
     html {
       scroll-behavior: smooth;
-      zoom: 0.9;
+      zoom: 0.93;
     }
     
     @-moz-document url-prefix() {
       body {
-        transform: scale(0.9);
+        transform: scale(0.93);
         transform-origin: top center;
-        width: 111.11%;
+        width: 107.53%;
       }
     }
 
@@ -536,9 +536,9 @@
         followerX += (mouseX - followerX) * 0.15;
         followerY += (mouseY - followerY) * 0.15;
         
-        // Compensate for 90% zoom
-        follower.style.left = (followerX / 0.9) + 'px';
-        follower.style.top = (followerY / 0.9) + 'px';
+        // Compensate for 93% zoom
+        follower.style.left = (followerX / 0.93) + 'px';
+        follower.style.top = (followerY / 0.93) + 'px';
         
         requestAnimationFrame(animate);
       }
