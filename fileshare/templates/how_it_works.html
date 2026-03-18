@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero { padding: 100px 24px 40px; text-align: center; position: relative; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(240,201,58,0.12) 0%, transparent 70%); pointer-events: none; }
+  
+  .workflow-container { max-width: 1300px; margin: 0 auto; padding: 40px 44px 100px; }
+  .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border: 1px solid var(--border); border-radius: 32px; background: rgba(14,17,24,0.4); padding: 48px; }
+  
+  .how-step { display: flex; flex-direction: column; gap: 24px; position: relative; padding-right: 24px; }
+  .how-step:not(:last-child) { border-right: 1px solid var(--border); }
+  .how-step:last-child { padding-right: 0; }
+  
+  .how-num { font-family: 'Playfair Display', serif; font-size: 80px; font-weight: 700; color: var(--border); line-height: 0.8; opacity: 0.6; }
+  .how-icon-wrap { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .how-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text); }
+  .how-desc { color: var(--muted); font-size: 15px; line-height: 1.7; min-height: 100px; }
+  
+  .how-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  .how-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--muted); }
+  .how-list li::before { content: '•'; color: var(--accent); font-weight: bold; }
+
+  @media (max-width: 1100px) {
+    .how-grid { grid-template-columns: repeat(2, 1fr); gap: 48px; }
+    .how-step:nth-child(2) { border-right: none; }
+    .how-step { padding-right: 0; }
+  }
+  @media (max-width: 600px) {
+    .how-grid { grid-template-columns: 1fr; }
+    .how-step { border-right: none !important; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
+    .how-step:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <p class="section-label">The Workflow</p>
+  <h1 class="section-title" style="font-size: clamp(40px, 6vw, 76px); margin-top: 12px;">Upload → Share → <em>Vanish.</em></h1>
+  <p class="hero-sub" style="margin: 20px auto 0; font-size: 17px; max-width: 600px;">A secure, automated pipeline from encrypted file upload to permanent, verifiable destruction.</p>
+</section>
+
+<div class="workflow-container">
+  <div class="how-grid">
+    <!-- Step 1 -->
+    <div class="how-step">
+      <div class="how-num">01</div>
+      <div class="how-icon-wrap"><i data-lucide="upload" class="icon"></i></div>
+      <div class="how-title">Upload &amp; Encrypt</div>
+      <div class="how-desc">User submits a file via form or API. Optionally encrypted with AES-256. Django saves to Cloudflare R2 and stores metadata in the database.</div>
+      <ul class="how-list">
+        <li>Optional AES-256 encryption</li>
+        <li>Stored in Cloudflare R2</li>
+        <li>Metadata saved to DB</li>
+      </ul>
+    </div>
+    
+    <!-- Step 2 -->
+    <div class="how-step">
+      <div class="how-num">02</div>
+      <div class="how-icon-wrap"><i data-lucide="link" class="icon"></i></div>
+      <div class="how-title">Generate Unique Link</div>
+      <div class="how-desc">Django generates a UUID-based link with a configurable expiry time. The link is returned to the uploader to share with the recipient.</div>
+      <ul class="how-list">
+        <li>SHA-256 obfuscated token</li>
+        <li>Expiry time configured</li>
+        <li>Optional password set</li>
+      </ul>
+    </div>
+    
+    <!-- Step 3 -->
+    <div class="how-step">
+      <div class="how-num">03</div>
+      <div class="how-icon-wrap"><i data-lucide="shield-check" class="icon"></i></div>
+      <div class="how-title">Validate &amp; Serve</div>
+      <div class="how-desc">Django validates the token — checking expiry, download count, and password — then serves the decrypted file to the recipient.</div>
+      <ul class="how-list">
+        <li>Token + expiry + password checked</li>
+        <li>File decrypted on-the-fly</li>
+        <li>Rate limiting enforced</li>
+      </ul>
+    </div>
+    
+    <!-- Step 4 -->
+    <div class="how-step">
+      <div class="how-num">04</div>
+      <div class="how-icon-wrap"><i data-lucide="trash-2" class="icon"></i></div>
+      <div class="how-title">Destruct &amp; Log</div>
+      <div class="how-desc">Link is instantly invalidated. Celery auto-deletes expired files from storage and the database. Every access is logged for auditing.</div>
+      <ul class="how-list">
+        <li>Link instantly invalidated</li>
+        <li>Celery removes from storage + DB</li>
+        <li>Access logged to database</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

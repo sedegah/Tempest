@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}Upload a File — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 44px 80px;
+    align-items: start;
+  }
+
+  .page-header {
+    grid-column: 1 / -1;
+    margin-bottom: 8px;
+  }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -.025em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .page-header p {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  .form-error-banner {
+    background: rgba(240, 90, 90, .1);
+    border: 1px solid rgba(240, 90, 90, .3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 22px 26px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-header-icon .icon {
+    width: 17px;
+    height: 17px;
+    color: var(--accent);
+  }
+
+  .card-header-title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .card-header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .card-body {
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--border2);
+    border-radius: 16px;
+    padding: 52px 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+    background: transparent;
+  }
+
+  .dropzone:hover,
+  .dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(240, 201, 58, .03);
+  }
+
+  .dropzone #id_file {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .dropzone-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    transition: border-color .2s;
+  }
+
+  .dropzone:hover .dropzone-icon,
+  .dropzone.drag-over .dropzone-icon {
+    border-color: var(--accent);
+  }
+
+  .dropzone-icon .icon {
+    width: 26px;
+    height: 26px;
+    color: var(--accent);
+  }
+
+  .dropzone-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .dropzone-sub {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .dropzone-sub strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .file-preview {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .file-preview.visible {
+    display: flex;
+  }
+
+  .file-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .file-icon .icon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+  }
+
+  .file-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .file-name {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .file-size {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .field-label .icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--muted);
+    opacity: .7;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 4px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    border-color: var(--accent);
+  }
+
+  .seg-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .seg-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .seg-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(240, 201, 58, .07);
+  }
+
+  .seg-btn span {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    opacity: .7;
+    margin-top: 1px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+
+  .toggle-row.active {
+    border-color: rgba(240, 201, 58, .3);
+  }
+
+  .toggle-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-icon .icon {
+    width: 15px;
+    height: 15px;
+    color: var(--accent);
+  }
+
+  .switch {
+    position: relative;
+    width: 42px;
+    height: 24px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .switch-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border2);
+    border-radius: 999px;
+  }
+
+  .switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: transform .2s;
+  }
+
+  .switch input:checked~.switch-track {
+    background: rgba(240, 201, 58, .3);
+  }
+
+  .switch input:checked~.switch-thumb {
+    transform: translateX(18px);
+    background: var(--accent);
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    justify-content: center;
+    font-size: 15px;
+    border-radius: 14px;
+    margin-top: 10px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .score-body {
+    padding: 22px;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 72px;
+    height: 72px;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .score-ring .track {
+    fill: none;
+    stroke: var(--border2);
+    stroke-width: 6;
+  }
+
+  .score-ring .fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 6;
+    stroke-dasharray: 188;
+    stroke-dashoffset: 188;
+    transition: stroke-dashoffset .6s ease;
+  }
+
+  .score-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .score-num span {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .score-level {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .score-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .check-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .check-dot.on {
+    background: rgba(76, 202, 122, .12);
+    border-color: rgba(76, 202, 122, .35);
+    color: var(--green);
+  }
+
+  @media (max-width: 860px) {
+    .page {
+      grid-template-columns: 1fr;
+      padding: 36px 20px 60px;
+    }
+
+    .seg-group {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="page">
+  <div class="page-header">
+    <p class="section-label">New Upload</p>
+    <h1>Share a file that <em>vanishes.</em></h1>
+    <p>Configure your file's security settings below. No account required — your data is never stored after delivery.
+    </p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px;">
+    <form method="post" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+      <input type="hidden" name="expires_in_hours" id="expiryHidden" value="24" />
+
+      {% if form.non_field_errors %}
+      <div class="form-error-banner">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="card" style="margin-bottom:22px;">
+        <div class="card-header">
+          <div class="card-header-icon"><i data-lucide="file-up" class="icon"></i></div>
+          <div>
+            <div class="card-header-title">Select File</div>
+            <div class="card-header-sub">Any file type up to 50 MB</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dropzone" id="dropzone">
+            {{ form.file }}
+            <div class="dropzone-icon"><i data-lucide="upload-cloud" class="icon"></i></div>
+            <div class="dropzone-title">Drop your file here</div>
+            <div class="dropzone-sub">or <strong>click to browse</strong></div>
+          </div>
+          <div class="file-preview" id="filePreview">
+            <div class="file-icon" id="fileIconWrap"><i data-lucide="file" class="icon"></i></div>
+            <div class="file-meta">
+              <div class="file-name" id="fileName"></div>
+              <div class="file-size" id="fileSize"></div>
+            </div>
+            <button type="button" class="file-remove" id="fileRemove"><i data-lucide="x" class="icon"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon"><i data-lucide="settings-2" class="icon"></i></div>
+          <div>
+            <div class="card-header-title">Security Settings</div>
+            <div class="card-header-sub">Custom self-destruct rules</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label"><i data-lucide="timer" class="icon"></i> Link Expiry</label>
+            <div class="seg-group">
+              <button type="button" class="seg-btn" data-hours="1">1 hr<span>Hourly</span></button>
+              <button type="button" class="seg-btn active" data-hours="24">24 hrs<span>Default</span></button>
+              <button type="button" class="seg-btn" data-hours="72">72 hrs<span>3 days</span></button>
+              <button type="button" class="seg-btn" data-hours="168">7 days<span>Weekly</span></button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label"><i data-lucide="lock" class="icon"></i> Encryption</label>
+            <label class="toggle-row active" id="encToggle">
+              <div class="toggle-left">
+                <div class="toggle-icon"><i data-lucide="lock" class="icon"></i></div>
+                <div class="toggle-text">
+                  <div class="t-title">AES-256 Encryption</div>
+                  <div class="t-sub">Secure per-file keys</div>
+                </div>
+              </div>
+              <label class="switch">{{ form.encrypt }}<div class="switch-track"></div>
+                <div class="switch-thumb"></div>
+              </label>
+            </label>
+          </div>
+          <div class="field">
+            <label class="field-label"><i data-lucide="key-round" class="icon"></i> Password Protection</label>
+            {{ form.password }}
+          </div>
+          <button type="submit" class="btn btn-primary submit-btn" id="submitBtn" disabled>Generate Secure Link</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="sidebar">
+    <div class="score-card">
+      <div class="score-body">
+        <div class="score-ring" style="margin: 0 auto 20px;">
+          <svg viewBox="0 0 72 72">
+            <circle class="track" cx="36" cy="36" r="30" />
+            <circle class="fill" id="scoreFill" cx="36" cy="36" r="30" />
+          </svg>
+          <div class="score-num" id="scoreNum">40<span>/ 100</span></div>
+        </div>
+        <div style="text-align:center;">
+          <div class="score-level" id="scoreLevel">Basic</div>
+          <p class="score-desc" id="scoreDesc" style="margin-top:8px;">Configure your settings for higher security.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('id_file');
+    const dropzone = document.getElementById('dropzone');
+    const encSwitch = document.getElementById('id_encrypt');
+
+    fileInput.addEventListener('change', e => {
+      if (e.target.files.length) {
+        document.getElementById('fileName').textContent = e.target.files[0].name;
+        document.getElementById('filePreview').classList.add('visible');
+        dropzone.style.display = 'none';
+        document.getElementById('submitBtn').disabled = false;
+        updateScore();
+      }
+    });
+
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('expiryHidden').value = btn.dataset.hours;
+      });
+    });
+
+    function updateScore() {
+      let score = 40;
+      if (fileInput.files.length) score += 10;
+      if (encSwitch.checked) score += 25;
+      const circumference = 188;
+      document.getElementById('scoreFill').style.strokeDashoffset = circumference - (score / 100) * circumference;
+      document.getElementById('scoreNum').innerHTML = `${score}<span>/ 100</span>`;
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Download — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; overflow: hidden; }
+    .stage-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(240, 201, 58, .05) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 20% 80%, rgba(77, 166, 255, .04) 0%, transparent 60%); }
+    .stage-grid { position: absolute; inset: 0; opacity: .1; pointer-events: none; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; }
+    .panel { display: none; position: relative; z-index: 1; width: 100%; max-width: 480px; animation: fadeUp .35s ease both; }
+    .panel.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: translateY(0) } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; }
+    .card-top { padding: 36px 36px 28px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+    .card-body { padding: 28px 36px 32px; display: flex; flex-direction: column; gap: 20px; }
+    .icon-circle { width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .icon-circle .icon { width: 30px; height: 30px; }
+    .ic-lock { background: rgba(240, 201, 58, .1); border: 1px solid rgba(240, 201, 58, .25); }
+    .ic-lock .icon { color: var(--accent); }
+    .ic-red { background: rgba(240, 90, 90, .1); border: 1px solid rgba(240, 90, 90, .3); }
+    .ic-red .icon { color: var(--red); }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+    .card-title em { font-style: italic; color: var(--accent); }
+    .card-sub { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 340px; }
+    .file-strip { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+    .file-strip-icon { width: 42px; height: 42px; border-radius: 11px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+    .file-strip-icon .icon { width: 19px; height: 19px; color: var(--accent); }
+    .file-strip-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-strip-detail { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; gap: 12px; }
+    .file-strip-detail span { display: flex; align-items: center; gap: 4px; }
+    .file-strip-detail .icon { width: 11px; height: 11px; color: var(--accent); }
+    .meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .meta-pill { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); padding: 5px 11px; border-radius: 999px; }
+    .meta-pill .icon { width: 11px; height: 11px; color: var(--accent); }
+    .meta-pill.warn { color: var(--orange); border-color: rgba(240, 148, 58, .3); background: rgba(240, 148, 58, .06); }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+    .field-label .icon { width: 12px; height: 12px; }
+    .input-wrap { position: relative; }
+    input[type="password"] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 13px 48px 13px 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); outline: none; transition: border-color .2s; }
+    input[type="password"].error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(240, 90, 90, .1); }
+    input[type="password"]:focus { border-color: var(--accent); }
+    .eye-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); display: flex; padding: 4px; }
+    .error-msg { display: none; align-items: center; gap: 8px; background: rgba(240, 90, 90, .08); border: 1px solid rgba(240, 90, 90, .25); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red); margin-top: 8px; }
+    .error-msg.visible { display: flex; }
+    .attempts-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .attempts-dots { display: flex; gap: 5px; }
+    .attempts-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); }
+    .attempts-dot.used { background: var(--red); }
+    .btn-full { width: 100%; justify-content: center; padding: 14px; font-size: 15px; border-radius: 14px; }
+    .divider { height: 1px; background: var(--border); }
+    .trust-footer { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+    .trust-item .icon { width: 12px; height: 12px; color: var(--accent); }
+    .decrypt-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 52px 36px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px; }
+    .decrypt-ring { position: relative; width: 88px; height: 88px; }
+    .decrypt-ring svg { transform: rotate(-90deg); }
+    .ring-track { fill: none; stroke: var(--border2); stroke-width: 5; }
+    .ring-fill { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 251; stroke-dashoffset: 251; transition: stroke-dashoffset .1s linear; }
+    .decrypt-ring-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .decrypt-ring-icon .icon { width: 28px; height: 28px; color: var(--accent); }
+    .decrypt-steps { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .dstep { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 13px; color: var(--muted); transition: all .3s; }
+    .dstep .icon { width: 16px; height: 16px; color: var(--border2); }
+    .dstep.active { border-color: rgba(240, 201, 58, .3); color: var(--text); }
+    .dstep.active .icon { color: var(--accent); }
+    .dstep.done { border-color: rgba(76, 202, 122, .25); }
+    .dstep.done .icon { color: var(--green); }
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; display: none; margin-left: auto; }
+    .spinner.visible { display: block; }
+    @keyframes spin { to { transform: rotate(360deg) } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stage">
+    <div class="stage-bg"></div>
+    <div class="stage-grid"></div>
+
+    {% if panel == 'locked' %}
+    <div class="panel active" id="panel-locked">
+        <div class="card">
+            <div class="card-top">
+                <div class="icon-circle ic-red"><i data-lucide="shield-x" class="icon"></i></div>
+                <div>
+                    <div class="card-title" style="color:var(--red);">Access <em>Locked</em></div>
+                    <p class="card-sub">Too many incorrect password attempts. This link has been locked and the file has been permanently deleted as a security measure.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="info-list" style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+                    <li style="display:flex;gap:10px;font-size:13px;color:var(--muted);"><i data-lucide="shield-alert" class="icon" style="color:var(--accent);"></i>3 failed attempts triggered lockdown.</li>
+                    <li style="display:flex;gap:10px;font-size:13px;color:var(--muted);"><i data-lucide="trash-2" class="icon" style="color:var(--accent);"></i>File and metadata purged.</li>
+                </ul>
+                <div class="divider" style="margin:20px 0;"></div>
+                <a href="{% url 'upload' %}" class="btn btn-primary btn-full">New Upload</a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="panel active" id="panel-auth">
+        <div class="card">
+            <div class="card-top">
+                <div class="icon-circle ic-lock"><i data-lucide="lock" class="icon"></i></div>
+                <div>
+                    <div class="card-title">Password <em>Required</em></div>
+                    <p class="card-sub">This file is protected. Enter the password shared by the sender to continue.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if shared_file %}
+                <div class="file-strip">
+                    <div class="file-strip-icon"><i data-lucide="file" class="icon"></i></div>
+                    <div class="file-strip-meta">
+                        <div class="file-strip-name">{{ shared_file.file.name|default:"Secure File" }}</div>
+                        <div class="file-strip-detail">
+                            {% if shared_file.encryption_key %}<span><i data-lucide="lock" class="icon"></i> AES-256</span>{% endif %}
+                            <span><i data-lucide="timer" class="icon"></i> Expires {{ shared_file.expires_at|timesince }} ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="meta-row">
+                    <div class="meta-pill"><i data-lucide="download" class="icon"></i> One-time download</div>
+                    {% if shared_file.encryption_key %}<div class="meta-pill warn"><i data-lucide="lock" class="icon"></i> Encrypted</div>{% endif %}
+                </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'download' token=token original_uuid=original_uuid %}" id="authForm" style="display:flex;flex-direction:column;gap:20px;">
+                    {% csrf_token %}
+                    <div class="field">
+                        <label class="field-label"><i data-lucide="key-round" class="icon"></i> Access Password</label>
+                        <div class="input-wrap">
+                            <input type="password" name="password" id="pwdInput" placeholder="Enter password" autocomplete="current-password" {% if error %}class="error"{% endif %} />
+                            <button type="button" class="eye-btn" id="eyeBtn"><i data-lucide="eye" class="icon"></i></button>
+                        </div>
+                        <div class="error-msg {% if error %}visible{% endif %}" id="errorMsg">
+                            <i data-lucide="alert-circle" class="icon"></i>
+                            <span id="errorText">{{ error }}</span>
+                        </div>
+                    </div>
+
+                    <div class="attempts-row">
+                        <span>Attempts remaining</span>
+                        <div class="attempts-dots">
+                            <div class="attempts-dot {% if attempts >= 1 %}used{% endif %}"></div>
+                            <div class="attempts-dot {% if attempts >= 2 %}used{% endif %}"></div>
+                            <div class="attempts-dot {% if attempts >= 3 %}used{% endif %}"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Unlock &amp; Decrypt</button>
+                </form>
+
+                <div class="divider"></div>
+                <div class="trust-footer">
+                    <div class="trust-item"><i data-lucide="shield-check" class="icon"></i> End-to-end encrypted</div>
+                    <div class="trust-item"><i data-lucide="eye-off" class="icon"></i> Zero-knowledge</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel" id="panel-decrypt">
+        <div class="decrypt-card">
+            <div class="decrypt-ring">
+                <svg viewBox="0 0 88 88" width="88" height="88"><circle class="ring-track" cx="44" cy="44" r="40" /><circle class="ring-fill" id="ringFill" cx="44" cy="44" r="40" /></svg>
+                <div class="decrypt-ring-icon"><i data-lucide="shield" class="icon" id="ringIcon"></i></div>
+            </div>
+            <div>
+                <div class="card-title" style="font-size:22px;">Decrypting File</div>
+                <p style="font-size:13px;color:var(--muted);">Verifying token and decrypting…</p>
+            </div>
+            <div class="decrypt-steps">
+                <div class="dstep" id="ds-token"><i data-lucide="fingerprint" class="icon"></i><span>Validating token</span><div class="spinner" id="sp-token"></div></div>
+                <div class="dstep" id="ds-exp"><i data-lucide="timer" class="icon"></i><span>Checking limits</span><div class="spinner" id="sp-exp"></div></div>
+                <div class="dstep" id="ds-aes"><i data-lucide="lock" class="icon"></i><span>Decrypting payload</span><div class="spinner" id="sp-aes"></div></div>
+                <div class="dstep" id="ds-log"><i data-lucide="scroll-text" class="icon"></i><span>Logging access</span><div class="spinner" id="sp-log"></div></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    lucide.createIcons();
+    let pwdVisible = false;
+    const eyeBtn = document.getElementById('eyeBtn');
+    if (eyeBtn) {
+        eyeBtn.addEventListener('click', () => {
+            pwdVisible = !pwdVisible;
+            document.getElementById('pwdInput').type = pwdVisible ? 'text' : 'password';
+            eyeBtn.innerHTML = `<i data-lucide="${pwdVisible ? 'eye-off' : 'eye'}" class="icon"></i>`;
+            lucide.createIcons();
+        });
+    }
+
+    const form = document.getElementById('authForm');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const val = document.getElementById('pwdInput').value;
+            if (!val) {
+                e.preventDefault();
+                const err = document.getElementById('errorMsg');
+                document.getElementById('errorText').textContent = 'Please enter the password.';
+                err.classList.add('visible');
+                return;
+            }
+            showDecryptAnimation(e);
+        });
+    }
+
+    function showPanel(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function showDecryptAnimation(submitEvent) {
+        submitEvent.preventDefault();
+        showPanel('panel-decrypt');
+        
+        const steps = ['token', 'exp', 'aes', 'log'];
+        const durations = [500, 400, 700, 400];
+        const circumference = 2 * Math.PI * 40;
+        const fill = document.getElementById('ringFill');
+        fill.style.strokeDashoffset = circumference;
+
+        steps.forEach((s, i) => {
+            const delay = durations.slice(0, i).reduce((a, b) => a + b, 0);
+            setTimeout(() => {
+                document.getElementById(`ds-${s}`).classList.add('active');
+                document.getElementById(`sp-${s}`).classList.add('visible');
+                fill.style.strokeDashoffset = circumference * (1 - ((delay + durations[i] * 0.5) / 2000));
+            }, delay);
+            setTimeout(() => {
+                const el = document.getElementById(`ds-${s}`);
+                el.classList.remove('active'); el.classList.add('done');
+                el.querySelector('i').setAttribute('data-lucide', 'check');
+                document.getElementById(`sp-${s}`).classList.remove('visible');
+                lucide.createIcons();
+            }, delay + durations[i]);
+        });
+
+        setTimeout(() => {
+            fill.style.strokeDashoffset = 0;
+            document.getElementById('ringIcon').setAttribute('data-lucide', 'shield-check');
+            lucide.createIcons();
+            setTimeout(() => { submitEvent.target.submit(); }, 400);
+        }, 2150);
+    }
+});
+</script>
+{% endblock %}

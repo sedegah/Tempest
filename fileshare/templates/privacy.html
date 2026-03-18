@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy — Tempest{% endblock %}
+
+{% block content %}
+<section style="padding: 120px 44px; max-width: 900px; margin: 0 auto;">
+  <p class="section-label">Legal</p>
+  <h1 class="section-title">Privacy <em>Policy</em></h1>
+  <p class="section-sub">Effective: March 18, 2026</p>
+  
+  <div style="margin-top: 60px; color: var(--text); line-height: 1.8; font-size: 16px; opacity: 0.9;">
+    <h3 style="margin: 40px 0 20px; color: var(--accent);">1. Data We Collect</h3>
+    <p>We collect minimal data necessary to provide our service. This includes the files you upload (encrypted), your IP address for rate limiting, and temporary session data.</p>
+    
+    <h3 style="margin: 40px 0 20px; color: var(--accent);">2. Encryption &amp; Security</h3>
+    <p>Files are encrypted using AES-256 before being stored on Cloudflare R2. We do not store your passwords in plain text; they are hashed using industry-standard algorithms.</p>
+    
+    <h3 style="margin: 40px 0 20px; color: var(--accent);">3. Data Retention</h3>
+    <p>Files are automatically deleted after they expire or are downloaded (if configured for one-time use). No backups are kept after deletion.</p>
+    
+    <h3 style="margin: 40px 0 20px; color: var(--accent);">4. Third Party Services</h3>
+    <p>We use Cloudflare for storage and DDoS protection. Your data is handled according to their security protocols.</p>
+  </div>
+</section>
+{% endblock %}

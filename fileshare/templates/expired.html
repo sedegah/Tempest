@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Link Expired — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 24px; position: relative; overflow: hidden; }
+  .stage-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(240, 77, 77, 0.08), transparent 70%); pointer-events: none; }
+  .content { position: relative; z-index: 1; width: 100%; max-width: 520px; text-align: center; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 60px 32px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .error-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: rgba(240, 77, 77, 0.1); border: 1px solid rgba(240, 77, 77, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .error-icon-wrap .icon { width: 36px; height: 36px; color: #f04d4d; }
+  .error-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1.2; }
+  .error-desc { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 380px; }
+  .btn-home { margin-top: 12px; padding: 14px 28px; border-radius: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stage">
+  <div class="stage-bg"></div>
+  <div class="content">
+    <div class="card">
+      <div class="error-icon-wrap"><i data-lucide="clock-off" class="icon"></i></div>
+      <h1 class="error-title">Link <em>Expired.</em></h1>
+      <p class="error-desc">The file you are looking for has been deleted or reached its expiration limit. Tempest ensures ephemeral security by auto-destructing data after use.</p>
+      
+      <div style="width:60px; height:1px; background:var(--border); margin:10px 0;"></div>
+      
+      <a href="{% url 'landing' %}" class="btn btn-primary btn-home">
+        <i data-lucide="arrow-left" class="icon" style="width:16px;height:16px;margin-right:8px;"></i> Return Home
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

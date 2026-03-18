@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Tempest — Secure File Sharing with Self-Destruct Links{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(240, 201, 58, 0.15), transparent 70%); pointer-events: none; }
+  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 50px 50px; opacity: 0.1; pointer-events: none; }
+  .hero-badge { background: var(--surface2); border: 1px solid var(--border); padding: 8px 20px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+  .hero-badge .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(40px, 8vw, 84px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 24px; }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-sub { color: var(--muted); font-size: clamp(16px, 1.2vw, 20px); max-width: 600px; line-height: 1.6; margin-bottom: 40px; }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+  .trust-band { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 24px 0; overflow: hidden; white-space: nowrap; }
+  .trust-track { display: flex; gap: 60px; animation: scroll 40s linear infinite; width: max-content; }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .trust-item .icon { width: 16px; height: 16px; color: var(--accent); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .cat-section { padding: 120px 44px; max-width: 1400px; margin: 0 auto; }
+  .cat-scroll { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
+  .cat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; }
+  .cat-card:hover { transform: translateY(-8px); border-color: var(--accent); background: var(--surface2); }
+  .cat-card-img { height: 180px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+  .cat-card-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .cat-card-name { font-size: 18px; font-weight: 700; }
+
+  .faq-section { padding: 100px 44px; max-width: 800px; margin: 0 auto; text-align: center; }
+  .faq-header { margin-bottom: 60px; }
+  .faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; text-align: left; }
+  .faq-q { width: 100%; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; background: none; border: none; cursor: pointer; color: var(--text); font-size: 15px; font-weight: 600; }
+  .faq-a { padding: 0 24px 20px; color: var(--muted); font-size: 14px; line-height: 1.6; display: none; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); transition: transform 0.3s; }
+
+  .cta-banner { padding: 120px 44px; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, #0e1118, #1a1e26); border: 1px solid var(--border); border-radius: 32px; display: flex; align-items: center; justify-content: space-between; gap: 60px; margin-bottom: 120px; }
+  .cta-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 56px); font-weight: 700; line-height: 1.1; margin-top: 12px; }
+  .cta-title em { font-style: italic; color: var(--accent); }
+  .cta-sub { font-size: 16px; color: var(--muted); margin-top: 20px; max-width: 480px; }
+  .cta-actions { display: flex; gap: 16px; }
+
+  @media (max-width: 900px) {
+    .cta-banner { flex-direction: column; text-align: center; gap: 40px; }
+    .hero { padding: 80px 24px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-badge"><span class="dot"></span> Secure &nbsp;·&nbsp; Ephemeral &nbsp;·&nbsp; Encrypted</div>
+  <h1>Share Files That<br /><em>Vanish in a Flash.</em></h1>
+  <p class="hero-sub">Tempest is a Django-based file-sharing platform with self-destructing links, AES-256 encryption, one-time downloads, and Cloudflare R2 integration — the Snapchat for files.</p>
+  <div class="hero-actions">
+    <a href="{% url 'upload' %}" class="btn btn-primary" style="padding:14px 32px;font-size:15px;">
+      Upload a File <i data-lucide="arrow-right" class="icon" style="width:15px;height:15px"></i>
+    </a>
+    <a href="{% url 'how_it_works' %}" class="btn btn-ghost" style="padding:14px 32px;font-size:15px;">How It Works</a>
+  </div>
+</section>
+
+<div class="trust-band">
+  <div class="trust-track">
+    <div class="trust-item"><i data-lucide="lock" class="icon"></i>AES-256 Encryption</div>
+    <div class="trust-item"><i data-lucide="flame" class="icon"></i>One-Time Downloads</div>
+    <div class="trust-item"><i data-lucide="timer" class="icon"></i>Auto-Expiring Links</div>
+    <div class="trust-item"><i data-lucide="trash-2" class="icon"></i>Auto-Delete on Expiry</div>
+    <div class="trust-item"><i data-lucide="cloud" class="icon"></i>Cloudflare R2 Storage</div>
+    <div class="trust-item"><i data-lucide="scroll-text" class="icon"></i>Full Access Logs</div>
+    <div class="trust-item"><i data-lucide="key-round" class="icon"></i>Password Protection</div>
+    <div class="trust-item"><i data-lucide="shield-check" class="icon"></i>DDoS Protection</div>
+    <div class="trust-item"><i data-lucide="cpu" class="icon"></i>Celery Background Tasks</div>
+    <!-- Duplicate for infinite scroll -->
+    <div class="trust-item"><i data-lucide="lock" class="icon"></i>AES-256 Encryption</div>
+    <div class="trust-item"><i data-lucide="flame" class="icon"></i>One-Time Downloads</div>
+    <div class="trust-item"><i data-lucide="timer" class="icon"></i>Auto-Expiring Links</div>
+    <div class="trust-item"><i data-lucide="trash-2" class="icon"></i>Auto-Delete on Expiry</div>
+    <div class="trust-item"><i data-lucide="cloud" class="icon"></i>Cloudflare R2 Storage</div>
+    <div class="trust-item"><i data-lucide="scroll-text" class="icon"></i>Full Access Logs</div>
+    <div class="trust-item"><i data-lucide="key-round" class="icon"></i>Password Protection</div>
+    <div class="trust-item"><i data-lucide="shield-check" class="icon"></i>DDoS Protection</div>
+    <div class="trust-item"><i data-lucide="cpu" class="icon"></i>Celery Background Tasks</div>
+  </div>
+</div>
+
+<section class="cat-section">
+  <p class="section-label">What Makes Tempest Different</p>
+  <h2 class="section-title">Secure. Ephemeral. Fast.</h2>
+  <p class="section-sub">Built for privacy-first file sharing with enterprise-grade security baked in from day one.</p>
+  <div class="cat-scroll">
+    <a href="{% url 'features' %}" class="cat-card">
+      <div class="cat-card-img" style="background:linear-gradient(145deg,#0a1a06,#0f2610);">
+        <i data-lucide="lock" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65"></i>
+      </div>
+      <div class="cat-card-body"><div class="cat-card-tag">Privacy</div><div class="cat-card-name">End-to-End Encryption</div></div>
+    </a>
+    <a href="{% url 'features' %}" class="cat-card">
+      <div class="cat-card-img" style="background:linear-gradient(145deg,#1a0d06,#281508);">
+        <i data-lucide="flame" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65"></i>
+      </div>
+      <div class="cat-card-body"><div class="cat-card-tag">Ephemeral</div><div class="cat-card-name">Self-Destruct Links</div></div>
+    </a>
+    <a href="{% url 'tech_stack' %}" class="cat-card">
+      <div class="cat-card-img" style="background:linear-gradient(145deg,#06101a,#081a28);">
+        <i data-lucide="cloud" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65"></i>
+      </div>
+      <div class="cat-card-body"><div class="cat-card-tag">Infrastructure</div><div class="cat-card-name">Cloudflare R2 &amp; Workers</div></div>
+    </a>
+    <a href="{% url 'features' %}" class="cat-card">
+      <div class="cat-card-img" style="background:linear-gradient(145deg,#160614,#22091e);">
+        <i data-lucide="scroll-text" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65"></i>
+      </div>
+      <div class="cat-card-body"><div class="cat-card-tag">Audit</div><div class="cat-card-name">Full Access Logs</div></div>
+    </a>
+    <a href="{% url 'tech_stack' %}" class="cat-card">
+      <div class="cat-card-img" style="background:linear-gradient(145deg,#0e1a06,#162610);">
+        <i data-lucide="cpu" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65"></i>
+      </div>
+      <div class="cat-card-body"><div class="cat-card-tag">Automation</div><div class="cat-card-name">Celery Auto-Delete</div></div>
+    </a>
+  </div>
+</section>
+
+<section class="faq-section" id="faq">
+  <div class="faq-header">
+    <p class="section-label">Got Questions?</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub" style="margin:10px auto 0;">Everything you need to know about Tempest.</p>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">How does the one-time download work?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">When a file is downloaded, the SharedFile model sets <code>downloaded=True</code>. The <code>is_expired()</code> method returns True, and all subsequent requests return a 410. The link is permanently invalid after first use.</div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-q" onclick="toggleFaq(this)">How is encryption handled?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
+    <div class="faq-a">Encryption is optional and uses the Python <code>cryptography</code> library with AES-256 (Fernet). A unique key is generated per file, stored in the DB, and used to decrypt on-the-fly when the file is served.</div>
+  </div>
+</section>
+
+<div class="cta-banner">
+  <div>
+    <p class="section-label">Start Now</p>
+    <h2 class="cta-title">The Infrastructure of<br /><em>Ephemeral Files.</em></h2>
+    <p class="cta-sub">Secure, scalable, and modern file sharing. One-time links, encryption, access logs — production-ready.</p>
+  </div>
+  <div class="cta-actions">
+    <a href="{% url 'upload' %}" class="btn btn-primary" style="padding:16px 36px;font-size:15px;">
+      Upload a File <i data-lucide="arrow-right" class="icon" style="width:15px;height:15px"></i>
+    </a>
+    <a href="{% url 'tech_stack' %}" class="btn btn-ghost" style="padding:16px 36px;font-size:15px;">View Tech Stack</a>
+  </div>
+</div>
+{% endblock %}

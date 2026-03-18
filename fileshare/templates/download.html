@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Download File — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 24px; position: relative; overflow: hidden; }
+  .stage-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(77, 166, 255, 0.1), transparent 70%); pointer-events: none; }
+  .content { position: relative; z-index: 1; width: 100%; max-width: 520px; text-align: center; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 48px 32px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .file-icon-wrap { width: 80px; height: 80px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .file-icon-wrap .icon { width: 36px; height: 36px; color: var(--accent); }
+  .file-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; word-break: break-all; line-height: 1.2; }
+  .file-meta { display: flex; gap: 16px; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .file-meta span { display: flex; align-items: center; gap: 6px; }
+  .file-meta .icon { width: 13px; height: 13px; }
+  .security-badge { display: flex; align-items: center; gap: 8px; background: rgba(76, 202, 122, 0.08); border: 1px solid rgba(76, 202, 122, 0.25); color: #4cca7a; padding: 10px 22px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .security-badge .icon { width: 16px; height: 16px; stroke-width: 2.5px; }
+  .btn-download { width: 100%; padding: 18px; font-size: 16px; border-radius: 14px; justify-content: center; }
+  .expiry-notice { font-size: 13px; color: var(--muted); margin-top: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stage">
+  <div class="stage-bg"></div>
+  <div class="content">
+    <div class="card">
+      <div class="file-icon-wrap"><i data-lucide="file" class="icon"></i></div>
+      <div class="security-badge"><i data-lucide="shield-check" class="icon"></i> Verified &amp; Encrypted</div>
+      <h1 class="file-name">{{ shared_file.file.name|default:"Uploaded File" }}</h1>
+      <div class="file-meta">
+        <span><i data-lucide="database" class="icon"></i> Secure Storage</span>
+        <span><i data-lucide="lock" class="icon"></i> AES-256</span>
+      </div>
+      <div style="width:100%; height:1px; background:var(--border); margin:10px 0;"></div>
+      <p style="color:var(--muted); font-size:14px; line-height:1.6;">Your secure file is ready for download. Note that this link may expire or be limited to a single download as per the sender's configuration.</p>
+      
+      <a href="{% url 'perform_download' token=token original_uuid=original_uuid %}" class="btn btn-primary btn-download">
+        <i data-lucide="download" class="icon" style="width:18px;height:18px"></i> Download Now
+      </a>
+      
+      <div class="expiry-notice">
+        <i data-lucide="timer" class="icon" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:4px;"></i> 
+        Self-destructs after download or on {{ shared_file.expires_at|date:"M d, H:i" }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

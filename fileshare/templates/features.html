@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Features — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero { padding: 100px 24px 40px; text-align: center; position: relative; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(76,202,122,0.1) 0%, transparent 70%); pointer-events: none; }
+  
+  .features-container { max-width: 1300px; margin: 0 auto; padding: 40px 44px 100px; }
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  
+  .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 24px; transition: border-color 0.3s, transform 0.3s; }
+  .feat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  
+  .feat-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .feat-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .feat-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: 0.05em; }
+  
+  .feat-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); }
+  .feat-desc { color: var(--muted); font-size: 16px; line-height: 1.7; }
+  
+  .feat-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+  .feat-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text); font-weight: 600; }
+  .feat-list li i { width: 16px; height: 16px; color: var(--green); }
+
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <p class="section-label">Core Capabilities</p>
+  <h1 class="section-title" style="font-size: clamp(40px, 6vw, 76px); margin-top: 12px;">Security is <em>Foundational.</em></h1>
+  <p class="hero-sub" style="margin: 20px auto 0; font-size: 17px; max-width: 600px;">Every feature designed with your data's privacy and ephemerality in mind.</p>
+</section>
+
+<div class="features-container">
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="shield-check" class="icon"></i></div><span class="feat-badge">Standard</span></div>
+      <div class="feat-name">AES-256 Encryption</div>
+      <div class="feat-desc">Military-grade encryption ensures that your files are unreadable to anyone without the original password. We never store your keys.</div>
+      <ul class="feat-list">
+        <li><i data-lucide="check" class="icon"></i> Industry-standard Fernet (AES-256)</li>
+        <li><i data-lucide="check" class="icon"></i> Zero-knowledge architecture</li>
+        <li><i data-lucide="check" class="icon"></i> Optional password protection</li>
+      </ul>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="flame" class="icon"></i></div><span class="feat-badge">Standard</span></div>
+      <div class="feat-name">Ephemeral Links</div>
+      <div class="feat-desc">Files automatically self-destruct based on your rules. Once deleted, they are purged from both storage and the database permanently.</div>
+      <ul class="feat-list">
+        <li><i data-lucide="check" class="icon"></i> Customizable expiry (1h - 7d)</li>
+        <li><i data-lucide="check" class="icon"></i> One-time download limits</li>
+        <li><i data-lucide="check" class="icon"></i> Automatic cleanup via Celery</li>
+      </ul>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="cloud" class="icon"></i></div><span class="feat-badge">Infrastructure</span></div>
+      <div class="feat-name">Edge Storage</div>
+      <div class="feat-desc">Leveraging Cloudflare R2 for globally distributed file storage with no egress fees and high durability.</div>
+      <ul class="feat-list">
+        <li><i data-lucide="check" class="icon"></i> High-performance object storage</li>
+        <li><i data-lucide="check" class="icon"></i> Geographically distributed</li>
+        <li><i data-lucide="check" class="icon"></i> Scalable up to 50MB per file</li>
+      </ul>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="activity" class="icon"></i></div><span class="feat-badge">Security</span></div>
+      <div class="feat-name">Verifiable Auditing</div>
+      <div class="feat-desc">Complete visibility into your file's lifecycle. Track every access attempt and the final deletion event.</div>
+      <ul class="feat-list">
+        <li><i data-lucide="check" class="icon"></i> Real-time access logging</li>
+        <li><i data-lucide="check" class="icon"></i> Failed attempt lockouts</li>
+        <li><i data-lucide="check" class="icon"></i> Guaranteed deletion confirmation</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

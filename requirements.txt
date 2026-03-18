@@ -1,0 +1,9 @@
+django
+djangorestframework
+python-dotenv
+cryptography
+django-ratelimit
+celery
+django-storages
+boto3
+requests

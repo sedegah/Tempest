@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Tech Stack — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero { padding: 100px 24px 40px; text-align: center; position: relative; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(77,166,255,0.1) 0%, transparent 70%); pointer-events: none; }
+  
+  .stack-container { max-width: 1300px; margin: 0 auto; padding: 40px 44px 100px; }
+  .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 60px; }
+  
+  .stack-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 20px; transition: border-color 0.3s; }
+  .stack-card:hover { border-color: var(--accent); }
+  
+  .stack-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); margin-bottom: 12px; }
+  .stack-layer { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.12em; }
+  .stack-tech { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text); }
+  .stack-detail { font-size: 15px; color: var(--muted); line-height: 1.7; }
+  
+  .code-section { background: rgba(14,17,24,0.6); border: 1px solid var(--border); border-radius: 24px; padding: 48px; position: relative; overflow: hidden; }
+  .code-bg { position: absolute; top: 0; right: 0; opacity: 0.05; font-size: 200px; font-family: monospace; font-weight: bold; transform: rotate(-20deg) translate(20%, -20%); pointer-events: none; }
+  .code-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 32px; }
+  .code-block { background: #000; border: 1px solid var(--border); border-radius: 16px; padding: 32px; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.8; color: #a9b1d6; overflow-x: auto; }
+  .kw { color: #bb9af7; } .st { color: #9ece6a; } .cm { color: #565f89; } .fn { color: #7aa2f7; }
+
+  @media (max-width: 1100px) { .stack-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .stack-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <p class="section-label">Infrastructure</p>
+  <h1 class="section-title" style="font-size: clamp(40px, 6vw, 76px); margin-top: 12px;">Built for <em>Reliability.</em></h1>
+  <p class="hero-sub" style="margin: 20px auto 0; font-size: 17px; max-width: 600px;">A modern, decoupled stack ensuring fast delivery and guaranteed data destruction.</p>
+</section>
+
+<div class="stack-container">
+  <div class="stack-grid">
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="server" class="icon"></i></div><div class="stack-layer">Core Backend</div><div class="stack-tech">Django 5.0</div><div class="stack-detail">The industry standard for secure, maintainable web applications with built-in protection against common vulnerabilities.</div></div>
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="hard-drive" class="icon"></i></div><div class="stack-layer">Edge Storage</div><div class="stack-tech">Cloudflare R2</div><div class="stack-detail">High-performance object storage that puts data closer to your recipients with zero egress fees for better efficiency.</div></div>
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="database" class="icon"></i></div><div class="stack-layer">Relational DB</div><div class="stack-tech">Cloudflare D1</div><div class="stack-detail">Serverless SQL database at the edge, providing ultra-low latency access to file metadata and audit trails.</div></div>
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="lock" class="icon"></i></div><div class="stack-layer">Encryption</div><div class="stack-tech">AES-256 (Fernet)</div><div class="stack-detail">Cryptographic security using authenticated symmetry, ensuring that files are unreadable even if the storage layer is compromised.</div></div>
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="zap" class="icon"></i></div><div class="stack-layer">Task Queue</div><div class="stack-tech">Celery + Redis</div><div class="stack-detail">Asynchronous background workers that handle file cleanup, logging, and heavy cryptographic operations without blocking the UI.</div></div>
+    <div class="stack-card"><div class="stack-icon"><i data-lucide="shield" class="icon"></i></div><div class="stack-layer">Authentication</div><div class="stack-tech">Secure Tokens</div><div class="stack-detail">Hashed, non-sequential identifiers that prevent link discovery and ensure only the uploader can grant access.</div></div>
+  </div>
+
+  <div class="code-section">
+    <div class="code-bg">&lt;/&gt;</div>
+    <div class="code-title">Development <em>Blueprint.</em></div>
+    <div class="code-block">
+      <span class="cm"># settings.py configuration snippet</span><br/>
+      <span class="kw">DEFAULT_FILE_STORAGE</span> = <span class="st">'storages.backends.s3boto3.S3Boto3Storage'</span><br/>
+      <span class="kw">AWS_S3_ENDPOINT_URL</span> = <span class="st">'https://ACCOUNT_ID.r2.cloudflarestorage.com'</span><br/>
+      <span class="kw">CRYPTOGRAPHY_ALGORITHM</span> = <span class="st">'AES-256-CBC'</span><br/>
+      <span class="kw">DATABASE_ROUTER</span> = <span class="st">'tempest.routers.D1Router'</span><br/>
+      <br/>
+      <span class="fn">@shared_task</span><br/>
+      <span class="kw">def</span> <span class="fn">purge_expired_files</span>():<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># Verification logic for self-destruct</span><br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="st">"DELETED"</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
