@@ -13,8 +13,10 @@
   .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 24px; transition: border-color 0.3s, transform 0.3s; }
   .feat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
   
-  .feat-card-top { display: flex; align-items: center; justify-content: space-between; }
-  .feat-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .feat-visual { height: 200px; border-radius: 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); overflow: hidden; }
+  .feat-visual .icon { width: 44px; height: 44px; color: var(--accent); position: relative; z-index: 1; }
+
+  .feat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .feat-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: 0.05em; }
   
   .feat-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); }
@@ -41,7 +43,8 @@
 <div class="features-container">
   <div class="features-grid">
     <div class="feat-card">
-      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="shield-check" class="icon"></i></div><span class="feat-badge">Standard</span></div>
+      <div class="feat-visual pattern-viz pattern-geometric"><div class="shape-1"></div><i data-lucide="shield-check" class="icon"></i></div>
+      <div class="feat-card-top"><span class="feat-badge">Standard</span></div>
       <div class="feat-name">AES-256 Encryption</div>
       <div class="feat-desc">Military-grade encryption ensures that your files are unreadable to anyone without the original password. We never store your keys.</div>
       <ul class="feat-list">
@@ -52,7 +55,8 @@
     </div>
 
     <div class="feat-card">
-      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="flame" class="icon"></i></div><span class="feat-badge">Standard</span></div>
+      <div class="feat-visual pattern-viz pattern-fiery"><div class="shape-1"></div><div class="shape-2"></div><div class="shape-3"></div><i data-lucide="flame" class="icon"></i></div>
+      <div class="feat-card-top"><span class="feat-badge">Standard</span></div>
       <div class="feat-name">Ephemeral Links</div>
       <div class="feat-desc">Files automatically self-destruct based on your rules. Once deleted, they are purged from both storage and the database permanently.</div>
       <ul class="feat-list">
@@ -63,7 +67,8 @@
     </div>
 
     <div class="feat-card">
-      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="cloud" class="icon"></i></div><span class="feat-badge">Infrastructure</span></div>
+      <div class="feat-visual pattern-viz pattern-waves"><div class="shape-1"></div><div class="shape-2"></div><i data-lucide="cloud" class="icon"></i></div>
+      <div class="feat-card-top"><span class="feat-badge">Infrastructure</span></div>
       <div class="feat-name">Edge Storage</div>
       <div class="feat-desc">Leveraging Cloudflare R2 for globally distributed file storage with no egress fees and high durability.</div>
       <ul class="feat-list">
@@ -74,7 +79,8 @@
     </div>
 
     <div class="feat-card">
-      <div class="feat-card-top"><div class="feat-icon-wrap"><i data-lucide="activity" class="icon"></i></div><span class="feat-badge">Security</span></div>
+      <div class="feat-visual pattern-viz pattern-ocean"><div class="shape-1"></div><div class="shape-2"></div><i data-lucide="activity" class="icon"></i></div>
+      <div class="feat-card-top"><span class="feat-badge">Security</span></div>
       <div class="feat-name">Verifiable Auditing</div>
       <div class="feat-desc">Complete visibility into your file's lifecycle. Track every access attempt and the final deletion event.</div>
       <ul class="feat-list">

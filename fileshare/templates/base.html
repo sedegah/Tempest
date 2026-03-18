@@ -336,6 +336,84 @@
         display: none;
       }
     }
+
+    /* Complex Feature Card Patterns */
+    .pattern-viz { position: relative; overflow: hidden; background: #07090f; }
+    .pattern-viz::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(240,201,58,0.03) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 80%, rgba(240,201,58,0.03) 0%, transparent 40%);
+      z-index: 1;
+    }
+
+    /* 1. Geometric (Mountains/Triangles) */
+    .pattern-geometric::after {
+      content: ''; position: absolute; inset: 0;
+      background: 
+        linear-gradient(135deg, rgba(240,201,58,0.08) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(240,201,58,0.05) 25%, transparent 25%),
+        linear-gradient(45deg, rgba(240,201,58,0.08) 25%, transparent 25%),
+        linear-gradient(315deg, rgba(240,201,58,0.05) 25%, transparent 25%);
+      background-size: 80px 80px;
+      opacity: 0.6;
+    }
+    .pattern-geometric .shape-1 {
+      position: absolute; bottom: -10%; left: -10%; width: 120%; height: 70%;
+      background: linear-gradient(180deg, transparent, rgba(240,201,58,0.1));
+      clip-path: polygon(0 100%, 20% 40%, 40% 80%, 60% 30%, 80% 70%, 100% 20%, 100% 100%);
+    }
+
+    /* 2. Fiery (Self-Destruct/Energy) */
+    .pattern-fiery::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 70% 80%, rgba(240,201,58,0.12) 0%, transparent 50%),
+                  radial-gradient(circle at 30% 90%, rgba(240,201,58,0.08) 0%, transparent 40%);
+    }
+    .pattern-fiery .shape-1 {
+      position: absolute; bottom: -20%; left: 10%; width: 140px; height: 140px;
+      background: rgba(240,201,58,0.07); border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
+      transform: rotate(15deg); filter: blur(10px);
+    }
+    .pattern-fiery .shape-2 {
+      position: absolute; bottom: -10%; right: 5%; width: 100px; height: 100px;
+      background: rgba(240,201,58,0.04); border-radius: 50%;
+      box-shadow: 0 0 30px rgba(240,201,58,0.1);
+    }
+    .pattern-fiery .shape-3 {
+      position: absolute; top: 20%; left: 20%; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 10px var(--accent); opacity: 0.4;
+    }
+
+    /* 3. Waves (Fluid/Wavy) */
+    .pattern-waves::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-radial-gradient(circle at 0% 0%, transparent 0, transparent 20px, rgba(240,201,58,0.03) 20px, rgba(240,201,58,0.03) 21px);
+    }
+    .pattern-waves .shape-1 {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(240,201,58,0.05) 60%, transparent 80%);
+      transform: skewY(-10deg) scale(1.5);
+    }
+    .pattern-waves .shape-2 {
+      position: absolute; width: 100%; height: 100%; top: 20%;
+      background: radial-gradient(ellipse at 50% 100%, rgba(240,201,58,0.08), transparent 70%);
+    }
+
+    /* 4. Ocean (Organic/Curves) */
+    .pattern-ocean::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 90% 10%, rgba(240,201,58,0.05) 0%, transparent 40%);
+    }
+    .pattern-ocean .shape-1 {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
+      background: rgba(240,201,58,0.05);
+      clip-path: ellipse(80% 50% at 50% 100%);
+    }
+    .pattern-ocean .shape-2 {
+      position: absolute; bottom: 0; right: 0; width: 120%; height: 35%;
+      background: rgba(240,201,58,0.03);
+      clip-path: ellipse(70% 60% at 100% 100%);
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
