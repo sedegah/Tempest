@@ -308,11 +308,40 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (pointer: fine) {
+      #cursor-follower {
+        position: fixed;
+        width: 14px;
+        height: 14px;
+        background: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 10000;
+        box-shadow: 0 0 15px rgba(240, 201, 58, 0.6);
+        transition: transform 0.15s ease-out, opacity 0.3s ease;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+        display: block;
+      }
+
+      body:hover #cursor-follower {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @media (pointer: coarse) {
+      #cursor-follower {
+        display: none;
+      }
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+  <div id="cursor-follower"></div>
 
   <div class="topbar">Open Source &nbsp;·&nbsp; Django + Cloudflare R2 &nbsp;·&nbsp; AES-256 Encryption &nbsp;·&nbsp;
     Files That Vanish in a Flash</div>
@@ -402,6 +431,31 @@
         if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
       });
     });
+
+    // Cursor follower logic
+    const follower = document.getElementById('cursor-follower');
+    if (follower) {
+      let mouseX = 0, mouseY = 0;
+      let followerX = 0, followerY = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (follower.style.opacity === '0') follower.style.opacity = '1';
+      });
+
+      function animate() {
+        // Smoothly interpolate position
+        followerX += (mouseX - followerX) * 0.15;
+        followerY += (mouseY - followerY) * 0.15;
+        
+        follower.style.left = followerX + 'px';
+        follower.style.top = followerY + 'px';
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
   </script>
   {% block extra_js %}{% endblock %}
 

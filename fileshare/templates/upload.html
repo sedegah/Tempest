@@ -520,6 +520,10 @@
             <div class="dropzone-icon"><i data-lucide="upload-cloud" class="icon"></i></div>
             <div class="dropzone-title">Drop your file here</div>
             <div class="dropzone-sub">or <strong>click to browse</strong></div>
+            {% if form.file.errors %}
+              <div class="field-error">{{ form.file.errors }}</div>
+            {% endif %}
+          </div>
           </div>
           <div class="file-preview" id="filePreview">
             <div class="file-icon" id="fileIconWrap"><i data-lucide="file" class="icon"></i></div>
@@ -578,6 +582,10 @@
           <div class="field">
             <label class="field-label"><i data-lucide="key-round" class="icon"></i> Password Protection</label>
             {{ form.password }}
+            {% if form.password.errors %}
+              <div class="field-error">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
           </div>
           <button type="submit" class="btn btn-primary submit-btn" id="submitBtn" disabled>Generate Secure Link</button>
         </div>
@@ -625,10 +633,7 @@
       }
     });
 
-    // Robustness: ensure clicking the dropzone (even if input miss) triggers the input
-    dropzone.addEventListener('click', () => {
-      fileInput.click();
-    });
+    // Removed redundant dropzone.addEventListener('click', ...) because id_file covers the area
 
     document.querySelectorAll('#expiryGroup .seg-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
