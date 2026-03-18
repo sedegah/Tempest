@@ -318,8 +318,9 @@
     Files That Vanish in a Flash</div>
 
   <nav>
-    <a href="{% url 'upload' %}" class="nav-logo">
+    <a href="{% url 'landing' %}" class="nav-logo">
       <i data-lucide="zap" class="icon" style="width:20px;height:20px;color:var(--accent)"></i>
+      <span>Tempest</span>
     </a>
     <ul class="nav-links">
       <li><a href="{% url 'features' %}">Features</a></li>
@@ -328,11 +329,8 @@
       <li><a href="{% url 'landing' %}#faq">FAQ</a></li>
     </ul>
     <div class="nav-right">
-      <a href="{% url 'upload' %}" class="btn btn-ghost">
+      <a href="{% url 'upload' %}" class="btn btn-primary">
         <i data-lucide="upload" class="icon" style="width:13px;height:13px"></i> Upload
-      </a>
-      <a href="{% url 'upload' %}#upload-form" class="btn btn-primary">
-        Get Started <i data-lucide="arrow-right" class="icon" style="width:13px;height:13px"></i>
       </a>
     </div>
   </nav>
@@ -342,8 +340,9 @@
   <footer>
     <div class="footer-top">
       <div class="footer-brand">
-        <a href="{% url 'upload' %}" class="nav-logo">
+        <a href="{% url 'landing' %}" class="nav-logo">
           <i data-lucide="zap" class="icon" style="width:19px;height:19px;color:var(--accent)"></i>
+          <span>Tempest</span>
         </a>
         <p>Secure, self-destructing file sharing with Django and Cloudflare. Files that vanish in a flash.</p>
         <div class="footer-email">
@@ -363,9 +362,9 @@
       <div class="footer-col">
         <h4>Developers</h4>
         <ul>
-          <li><a href="#">Documentation</a></li>
-          <li><a href="#">API Reference</a></li>
-          <li><a href="https://github.com/sedegah">GitHub</a></li>
+          <li><a href="{% url 'documentation' %}">Documentation</a></li>
+          <li><a href="{% url 'api_reference' %}">API Reference</a></li>
+          <li><a href="https://github.com/sedegahkim">GitHub</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -382,7 +381,7 @@
       <div class="footer-links">
         <a href="{% url 'privacy' %}">Privacy</a>
         <a href="{% url 'terms' %}">Terms</a>
-        <a href="https://github.com/sedegah">GitHub</a>
+        <a href="https://github.com/sedegahkim">GitHub</a>
       </div>
     </div>
   </footer>

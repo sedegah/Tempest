@@ -12,4 +12,6 @@ urlpatterns = [
     path('perform-download/<str:token>/<uuid:original_uuid>/', views.perform_download, name='perform_download'),
     path('privacy/', views.privacy_view, name='privacy'),
     path('terms/', views.terms_view, name='terms'),
+    path('documentation/', views.documentation_view, name='documentation'),
+    path('api-reference/', views.api_reference_view, name='api_reference'),
 ]

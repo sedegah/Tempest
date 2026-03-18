@@ -28,6 +28,12 @@ def privacy_view(request):
 def terms_view(request):
     return render(request, 'terms.html')
 
+def documentation_view(request):
+    return render(request, 'documentation.html')
+
+def api_reference_view(request):
+    return render(request, 'api_reference.html')
+
 
 def get_encryption_key(file_specific_key=None):
     if file_specific_key:

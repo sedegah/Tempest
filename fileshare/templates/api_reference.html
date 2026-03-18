@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}API Reference — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .api-container { max-width: 1200px; margin: 0 auto; padding: 100px 44px; }
+  .api-header { text-align: center; margin-bottom: 80px; }
+  
+  .api-method { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 32px; }
+  .method-header { padding: 20px 24px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+  .badge { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+  .badge-post { background: rgba(77, 166, 255, 0.1); color: var(--blue); border: 1px solid var(--blue); }
+  .endpoint { font-family: monospace; font-size: 14px; font-weight: 600; color: var(--text); }
+  
+  .method-body { padding: 24px; }
+  .method-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+  
+  .param-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .param-table th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--muted); padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .param-table td { padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .param-name { font-family: monospace; font-weight: 600; color: var(--accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="api-container">
+  <header class="api-header">
+    <p class="section-label">Developer API</p>
+    <h1 class="section-title">API <em>Reference</em></h1>
+    <p class="section-sub" style="margin: 0 auto;">Build atop the Tempest infrastructure with our simple REST API.</p>
+  </header>
+
+  <div class="api-method">
+    <div class="method-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint">/upload/</span>
+    </div>
+    <div class="method-body">
+      <p class="method-desc">Upload a file and get a secure sharing link. Supports multipart/form-data.</p>
+      
+      <table class="param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="param-name">file</td><td>File</td><td>The file to be shared (max 50MB).</td></tr>
+          <tr><td class="param-name">password</td><td>String</td><td>Optional password protection for the link.</td></tr>
+          <tr><td class="param-name">encrypt</td><td>Boolean</td><td>Whether to enable AES-256 encryption.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

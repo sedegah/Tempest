@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation — Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .doc-container { max-width: 1200px; margin: 0 auto; padding: 100px 44px; display: grid; grid-template-columns: 260px 1fr; gap: 60px; }
+  .doc-nav { position: sticky; top: 120px; height: fit-content; }
+  .doc-nav h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 20px; }
+  .doc-nav ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .doc-nav a { font-size: 14px; color: var(--text); text-decoration: none; opacity: 0.6; transition: opacity 0.2s; }
+  .doc-nav a:hover { opacity: 1; color: var(--accent); }
+  
+  .doc-content { max-width: 800px; }
+  .doc-section { margin-bottom: 80px; }
+  .doc-section h2 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 24px; color: var(--text); }
+  .doc-section p { font-size: 16px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+  
+  .code-block { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; font-family: monospace; font-size: 14px; line-height: 1.6; color: var(--text); overflow-x: auto; margin: 24px 0; }
+  
+  @media (max-width: 900px) {
+    .doc-container { grid-template-columns: 1fr; padding: 60px 24px; }
+    .doc-nav { display: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="doc-container">
+  <aside class="doc-nav">
+    <h4>Documentation</h4>
+    <ul>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#encryption">Encryption Layer</a></li>
+      <li><a href="#storage">Storage (R2)</a></li>
+      <li><a href="#self-destruct">Self-Destruction</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc-content">
+    <section id="introduction" class="doc-section">
+      <p class="section-label">Overview</p>
+      <h2 class="section-title">Introduction</h2>
+      <p>Tempest is an open-source, ephemeral file-sharing platform designed for maximum privacy and minimal footprint. Built on Django and Cloudflare R2, it provides a "Snapchat for files" experience with military-grade encryption.</p>
+    </section>
+
+    <section id="getting-started" class="doc-section">
+      <h2>Getting Started</h2>
+      <p>To deploy your own instance of Tempest, you'll need a Cloudflare account with R2 enabled and a Python environment.</p>
+      <div class="code-block">
+        git clone https://github.com/sedegahkim/tempest<br/>
+        pip install -r requirements.txt<br/>
+        python manage.py migrate
+      </div>
+    </section>
+
+    <section id="encryption" class="doc-section">
+      <h2>Encryption Layer</h2>
+      <p>We use the <code>cryptography</code> library's Fernet implementation (AES-256 in CBC mode with HMAC-SHA256). Each file is encrypted with a unique key that never touches our long-term logs.</p>
+    </section>
+  </main>
+</div>
+{% endblock %}
