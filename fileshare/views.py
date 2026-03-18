@@ -177,7 +177,9 @@ def perform_download(request, token, original_uuid):
         file_content = StorageInterface.get_file_content(file_name)
         if not file_content:
             if settings.DEBUG:
-                raise Http404(f"File not found in storage: {file_name}")
+                from django.core.files.storage import default_storage
+                last_url = getattr(default_storage, 'last_failed_url', 'Unknown URL')
+                raise Http404(f"File not found in storage: {file_name} at {last_url}")
             raise Http404("File not found in storage.")
 
         if shared_file.encryption_key:

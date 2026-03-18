@@ -47,9 +47,11 @@ class CloudflareR2Storage(Storage):
             "Authorization": f"Bearer {self.token}",
             "Range": "bytes=0-0"
         }
-        print(f"R2 EXISTS: {url}")
         res = requests.get(url, headers=headers)
-        print(f"R2 EXISTS Status: {res.status_code}")
+        if res.status_code not in [200, 206] and settings.DEBUG:
+            # We'll store the last failed URL in the object for debugging if needed, 
+            # but better to just return it in the exception.
+            self.last_failed_url = url
         return res.status_code in [200, 206]
 
     def url(self, name):
