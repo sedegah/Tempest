@@ -31,6 +31,15 @@
 
     html {
       scroll-behavior: smooth;
+      zoom: 0.9;
+    }
+    
+    @-moz-document url-prefix() {
+      body {
+        transform: scale(0.9);
+        transform-origin: top center;
+        width: 111.11%;
+      }
     }
 
     body {
