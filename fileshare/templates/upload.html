@@ -397,36 +397,50 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
-    overflow: hidden;
-  }
-
-  .score-body {
-    padding: 22px;
-  }
-
-  .score-ring {
+    padding: 24px 30px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
     position: relative;
-    width: 72px;
-    height: 72px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240, 201, 58, 0.3), transparent);
+  }
+
+  .score-visual {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
   }
 
   .score-ring svg {
     transform: rotate(-90deg);
+    width: 80px;
+    height: 80px;
   }
 
   .score-ring .track {
     fill: none;
-    stroke: var(--border2);
-    stroke-width: 6;
+    stroke: var(--surface2);
+    stroke-width: 5;
   }
 
   .score-ring .fill {
     fill: none;
     stroke: var(--accent);
-    stroke-width: 6;
-    stroke-dasharray: 188;
-    stroke-dashoffset: 188;
-    transition: stroke-dashoffset .6s ease;
+    stroke-width: 5;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .8s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 4px rgba(240, 201, 58, 0.5));
   }
 
   .score-num {
@@ -436,25 +450,68 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
   }
 
   .score-num span {
     font-size: 10px;
     color: var(--muted);
+    font-weight: 500;
+    margin-top: -2px;
+  }
+
+  .score-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .score-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .score-status {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent);
+    background: rgba(240, 201, 58, 0.1);
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(240, 201, 58, 0.2);
   }
 
   .score-level {
-    font-size: 15px;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--text);
   }
 
-  .score-desc {
-    font-size: 12px;
+  .score-hint {
+    font-size: 13px;
     color: var(--muted);
-    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-hint i {
+    color: var(--accent);
+    width: 14px;
+    height: 14px;
   }
 
   .check-dot {
@@ -497,24 +554,25 @@
   </div>
 
   <div style="display:flex;flex-direction:column;gap:22px;">
-    <!-- Premium Redesigned Security Score -->
-    <div class="score-card" style="background: linear-gradient(110deg, var(--surface) 0%, #11151c 100%); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin-bottom: 12px; position: relative; overflow: hidden;">
-      <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent); opacity: 0.03; filter: blur(60px); pointer-events: none;"></div>
-      <div class="score-body" style="display: flex; align-items: center; gap: 32px; padding: 24px 32px;">
-        <div class="score-ring" style="width: 80px; height: 80px; filter: drop-shadow(0 0 8px rgba(240, 201, 58, 0.2));">
-          <svg viewBox="0 0 72 72" style="width: 80px; height: 80px;">
-            <circle class="track" cx="36" cy="36" r="30" style="stroke: rgba(255,255,255,0.05); stroke-width: 5;" />
-            <circle class="fill" id="scoreFill" cx="36" cy="36" r="30" style="stroke: var(--accent); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 4px var(--accent)); transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);" />
+    <div class="score-card">
+      <div class="score-visual">
+        <div class="score-ring">
+          <svg viewBox="0 0 80 80">
+            <circle class="track" cx="40" cy="40" r="32" />
+            <circle class="fill" id="scoreFill" cx="40" cy="40" r="32" />
           </svg>
-          <div class="score-num" id="scoreNum" style="font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">40<span style="font-size: 11px; opacity: 0.5;">%</span></div>
+          <div class="score-num" id="scoreNum">40<span>/ 100</span></div>
         </div>
-        <div style="flex: 1;">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-            <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--accent); letter-spacing: 0.1em; background: rgba(240, 201, 58, 0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(240, 201, 58, 0.2);">Shield Active</div>
-            <div style="height: 1px; flex: 1; background: linear-gradient(90deg, rgba(240,201,58,0.2), transparent);"></div>
-            <div id="scoreLevel" style="font-size: 14px; font-weight: 700; color: var(--text);">Security: Basic</div>
-          </div>
-          <p class="score-desc" id="scoreDesc" style="color: var(--muted); font-size: 13px; line-height: 1.5;">Enhance your settings to reach <b>Maximum Security</b> status.</p>
+      </div>
+      <div class="score-info">
+        <div class="score-header">
+          <div class="score-label">Security Protocol</div>
+          <div class="score-status" id="scoreStatus">Basic Protection</div>
+        </div>
+        <div class="score-level" id="scoreLevel">Standard</div>
+        <div class="score-hint" id="scoreDesc">
+          <i data-lucide="shield-alert"></i>
+          <span>Add a password or encryption for better security.</span>
         </div>
       </div>
     </div>
@@ -661,16 +719,41 @@
       let score = 40;
       if (fileInput.files.length) score += 10;
       if (encSwitch && encSwitch.checked) score += 25;
-      const circumference = 188;
+      const pwdInput = document.getElementById('id_password');
+      if (pwdInput && pwdInput.value) score += 25;
+
+      const circumference = 2 * Math.PI * 32; // 201.06
       const fill = document.getElementById('scoreFill');
       if (fill) {
+        fill.style.strokeDasharray = circumference;
         fill.style.strokeDashoffset = circumference - (score / 100) * circumference;
       }
+      
       const num = document.getElementById('scoreNum');
-      if (num) {
-          num.innerHTML = `${score}<span>/ 100</span>`;
+      if (num) num.innerHTML = `${score}<span>/ 100</span>`;
+
+      const level = document.getElementById('scoreLevel');
+      const status = document.getElementById('scoreStatus');
+      const desc = document.getElementById('scoreDesc');
+      
+      if (score < 50) {
+        level.textContent = 'Standard';
+        status.textContent = 'Basic Protection';
+        desc.innerHTML = '<i data-lucide="shield-alert"></i><span>Add a password or encryption for better security.</span>';
+      } else if (score < 80) {
+        level.textContent = 'Enhanced';
+        status.textContent = 'Strong Protection';
+        desc.innerHTML = '<i data-lucide="shield-plus"></i><span>Your file is now well protected.</span>';
+      } else {
+        level.textContent = 'Fortress';
+        status.textContent = 'Ultimate Security';
+        desc.innerHTML = '<i data-lucide="shield-check"></i><span>Maximum security protocols active.</span>';
       }
+      lucide.createIcons();
     }
+    
+    document.getElementById('id_password')?.addEventListener('input', updateScore);
+    document.getElementById('id_encrypt')?.addEventListener('change', updateScore);
     
     // Initial score check
     updateScore();
