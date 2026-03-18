@@ -99,6 +99,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEFAULT_FROM_EMAIL = 'sedegahkim@gmail.com'
+SERVER_EMAIL = 'sedegahkim@gmail.com'
+
 FILES_ENCRYPTION_KEY = os.environ.get('FILES_ENCRYPTION_KEY', '1dHIzIgFg1We4ahnZ_qoKEmcDcAinwCyOJrOxPh-2yQ=')
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'memory://')
