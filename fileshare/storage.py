@@ -1,5 +1,6 @@
 import os
 import requests
+import urllib.parse
 from django.core.files.storage import Storage
 from django.utils.deconstruct import deconstructible
 from django.conf import settings
@@ -11,38 +12,44 @@ class CloudflareR2Storage(Storage):
         self.bucket_name = os.environ.get('CLOUDFLARE_R2_STORAGE_BUCKET_NAME')
         self.token = os.environ.get('CLOUDFLARE_R2_SECRET_ACCESS_KEY')
         self.endpoint = f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/r2/buckets/{self.bucket_name}/objects"
+    def _get_url(self, name):
+        safe_name = urllib.parse.quote(name, safe='')
+        return f"{self.endpoint}/{safe_name}"
 
     def _save(self, name, content):
-        url = f"{self.endpoint}/{name}"
+        url = self._get_url(name)
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/octet-stream"
         }
         content.seek(0)
+        print(f"R2 PUT: {url}")
         res = requests.put(url, data=content.read(), headers=headers)
         if res.status_code not in [200, 201]:
+            print(f"R2 PUT Error: {res.status_code} {res.text}")
             raise Exception(f"R2 Upload failed: {res.status_code} {res.text}")
         return name
 
     def _open(self, name, mode='rb'):
-        # For our app, we usually use the Public URL or a signed request.
-        # But for this simple storage, we'll try to GET it via API if needed.
-        url = f"{self.endpoint}/{name}"
+        url = self._get_url(name)
         headers = {"Authorization": f"Bearer {self.token}"}
+        print(f"R2 GET: {url}")
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
-            raise Exception(f"R2 Download failed: {res.status_code}")
-        from io import BytesIO
+            print(f"R2 GET Error: {res.status_code} {res.text}")
+            raise Exception(f"R2 Download failed: {res.status_code} {res.text}")
         from django.core.files.base import ContentFile
         return ContentFile(res.content, name=name)
 
     def exists(self, name):
-        url = f"{self.endpoint}/{name}"
+        url = self._get_url(name)
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Range": "bytes=0-0"
         }
+        print(f"R2 EXISTS: {url}")
         res = requests.get(url, headers=headers)
+        print(f"R2 EXISTS Status: {res.status_code}")
         return res.status_code in [200, 206]
 
     def url(self, name):
@@ -52,6 +59,6 @@ class CloudflareR2Storage(Storage):
         return f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/r2/buckets/{self.bucket_name}/objects/{name}"
         
     def delete(self, name):
-        url = f"{self.endpoint}/{name}"
+        url = self._get_url(name)
         headers = {"Authorization": f"Bearer {self.token}"}
         requests.delete(url, headers=headers)

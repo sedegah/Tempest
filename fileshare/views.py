@@ -111,7 +111,7 @@ def download_view(request, token, original_uuid):
     if shared_file.is_expired():
         log.success = False
         log.save()
-        return render(request, 'expired.html', status=410)
+        return render(request, 'link_expired.html', status=410)
 
     if shared_file.password:
         attempts = int(request.session.get(f'pwd_attempts_{original_uuid}', 0))
@@ -163,7 +163,7 @@ def perform_download(request, token, original_uuid):
     
     # Check if download is still valid (e.g. not one-time used already)
     if shared_file.is_expired():
-         return render(request, 'expired.html', status=410)
+         return render(request, 'link_expired.html', status=410)
 
     # Check password if applicable (session check)
     if shared_file.password:
@@ -199,4 +199,6 @@ def perform_download(request, token, original_uuid):
         return response
 
     except Exception as e:
+        if settings.DEBUG:
+            raise Http404(f"File could not be read: {str(e)}")
         raise Http404("File could not be read.")
