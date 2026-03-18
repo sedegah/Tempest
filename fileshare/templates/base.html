@@ -536,8 +536,9 @@
         followerX += (mouseX - followerX) * 0.15;
         followerY += (mouseY - followerY) * 0.15;
         
-        follower.style.left = followerX + 'px';
-        follower.style.top = followerY + 'px';
+        // Compensate for 90% zoom
+        follower.style.left = (followerX / 0.9) + 'px';
+        follower.style.top = (followerY / 0.9) + 'px';
         
         requestAnimationFrame(animate);
       }

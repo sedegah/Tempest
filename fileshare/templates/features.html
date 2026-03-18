@@ -8,9 +8,8 @@
   .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(76,202,122,0.1) 0%, transparent 70%); pointer-events: none; }
   
   .features-container { max-width: 1300px; margin: 0 auto; padding: 40px 44px 100px; }
-  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
-  
-  .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 24px; transition: border-color 0.3s, transform 0.3s; }
+  .features-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
+  .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 24px; transition: border-color 0.3s, transform 0.3s; flex: 1 1 400px; max-width: 600px; }
   .feat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
   
   .feat-visual { height: 200px; border-radius: 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); overflow: hidden; }
