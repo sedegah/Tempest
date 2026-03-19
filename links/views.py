@@ -2,7 +2,7 @@
 import uuid
 from django.shortcuts import redirect, render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
-from datetime import datetime, timezone
+from django.utils import timezone
 from .interfaces import ShortLinkDBInterface
 from fileshare.interfaces import DBInterface
 from fileshare.views import get_obfuscated_token
@@ -26,12 +26,12 @@ def short_redirect_view(request, code):
         return HttpResponseNotFound("The file associated with this link no longer exists.")
         
     # Validation logic (Link level)
-    now = datetime.now(timezone.utc)
+    now = timezone.now()
     if link.expires_at and now >= link.expires_at:
-        return render(request, 'link_expired.html', status=403)
+        return render(request, 'link_expired.html', {"reason": "Link expired by time limit"}, status=403)
         
     if link.download_count >= link.max_downloads:
-        return render(request, 'link_expired.html', {"reason": "Download limit reached"}, status=403)
+        return render(request, 'link_expired.html', {"reason": f"Download limit reached ({link.download_count}/{link.max_downloads})"}, status=403)
 
     # Validation logic (File level inheritance)
     if shared_file.is_expired():

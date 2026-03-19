@@ -95,7 +95,7 @@ def upload_view(request):
             raw_password = form.cleaned_data.get('password')
             hashed_password = generate_password_hash(raw_password) if raw_password else None
             
-            expires_in_hours = int(form.cleaned_data.get('expires_in_hours', 24))
+            expires_in_hours = float(form.cleaned_data.get('expires_in_hours', 24))
             expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_in_hours)
             
             uploaded_file = request.FILES['file']
@@ -124,8 +124,12 @@ def upload_view(request):
             
             DBInterface.create_shared_file(shared_file)
             
-            # Create a ShortLink for this file
-            short_link = ShortLink(shared_file_id=shared_file.id)
+            # Create a ShortLink for this file (inheriting file limits)
+            short_link = ShortLink(
+                shared_file_id=shared_file.id,
+                max_downloads=shared_file.max_downloads,
+                expires_at=shared_file.expires_at
+            )
             ShortLinkDBInterface.create_short_link(short_link)
             
             secure_token = get_obfuscated_token(shared_file.token)

@@ -25,7 +25,14 @@ class UploadForm(forms.Form):
     password = forms.CharField(max_length=128, required=False)
     encrypt = forms.BooleanField(required=False, initial=True)
     expires_in_hours = forms.ChoiceField(
-        choices=[(1, '1 Hour'), (24, '24 Hours'), (72, '3 Days')],
+        choices=[
+            (0.166, '10 Minutes'),
+            (1, '1 Hour'),
+            (5, '5 Hours'),
+            (24, '24 Hours'),
+            (72, '3 Days'),
+            (168, '1 Week')
+        ],
         initial=24
     )
     max_downloads = forms.IntegerField(min_value=1, max_value=100, initial=1)

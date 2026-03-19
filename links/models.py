@@ -1,9 +1,9 @@
-# pyre-ignore-all-errors
 import uuid
+import datetime
 import secrets
 import string
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from django.utils import timezone
 from typing import Optional
 
 @dataclass
@@ -19,8 +19,8 @@ class ShortLink:
     shared_file_id: str = ""
     
     # Tracking
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    expires_at: Optional[datetime] = None
+    created_at: datetime.datetime = field(default_factory=timezone.now)
+    expires_at: Optional[datetime.datetime] = None
     
     # Utilization Thresholds
     max_downloads: int = 1
@@ -39,7 +39,7 @@ class ShortLink:
         """
         Calculates if the short link itself (independent of the file) has expired.
         """
-        now = datetime.now(timezone.utc)
+        now = timezone.now()
         if self.expires_at and now >= self.expires_at:
             return True
         if self.download_count >= self.max_downloads:
