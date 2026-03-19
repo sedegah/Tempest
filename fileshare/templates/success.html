@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+{% endblock %}
+
 {% block title %}Secure Link Generated | Tempest File Sharing{% endblock %}
 
 {% block extra_css %}
@@ -45,7 +49,6 @@
 {% endblock %}
 
 {% block content %}
-<canvas id="confetti"></canvas>
 <div class="stage">
   <div class="stage-bg"></div>
   <div class="stage-grid"></div>
@@ -137,21 +140,26 @@ document.addEventListener('DOMContentLoaded', function() {
     window.open(`https://wa.me/?text=${encodeURIComponent(link)}`);
   });
 
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const pieces = Array.from({length:60}, () => ({
-    x: Math.random() * canvas.width, y: -20, w: 8, h: 6,
-    r: Math.random() * Math.PI, vx: (Math.random()-0.5)*3, vy: 2+Math.random()*3,
-    color: ['#f0c93a','#4cca7a','#4da6ff'][Math.floor(Math.random()*3)]
-  }));
-  let frame = 0;
-  function animate() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p => { p.x += p.vx; p.y += p.vy; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,p.w,p.h); });
-    if(frame++ < 100) requestAnimationFrame(animate); else ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Premium Confetti Effect
+  const duration = 3 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
   }
-  animate();
+
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    const particleCount = 50 * (timeLeft / duration);
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+  }, 250);
 
   const expiry = new Date("{{ file.expires_at|date:'c' }}");
   function updateTimer() {

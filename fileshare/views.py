@@ -3,7 +3,8 @@ import os
 import hashlib
 import uuid
 import secrets
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.conf import settings
