@@ -154,7 +154,7 @@ def success_view(request, token, original_uuid):
     
     if results:
         short_code = results[0]["code"]
-        short_url = request.build_absolute_uri(f'/d/{short_code}/')
+        short_url = request.build_absolute_uri(f'/s/{short_code}/')
     else:
         short_url = request.build_absolute_uri(f'/download/{token}/{original_uuid}/')
 
