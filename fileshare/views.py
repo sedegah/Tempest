@@ -163,11 +163,13 @@ def success_view(request, token, original_uuid):
 
 @ratelimit(key='ip', rate='20/m', block=True)
 def download_view(request, token, original_uuid):
-    shared_file = get_shared_file_or_404(original_uuid)
+    shared_file = DBInterface.get_file_by_uuid(original_uuid)
+    if not shared_file:
+        return render(request, 'link_expired.html', status=404)
     
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
-        raise Http404()
+        return render(request, 'link_expired.html', status=404)
     
     if shared_file.is_expired():
         DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "expired")
@@ -215,11 +217,13 @@ def download_view(request, token, original_uuid):
 
 @ratelimit(key='ip', rate='10/m', block=True)
 def perform_download(request, token, original_uuid):
-    shared_file = get_shared_file_or_404(original_uuid)
+    shared_file = DBInterface.get_file_by_uuid(original_uuid)
+    if not shared_file:
+        return render(request, 'link_expired.html', status=404)
     
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
-        raise Http404()
+        return render(request, 'link_expired.html', status=404)
     
     if shared_file.is_expired():
          return render(request, 'link_expired.html', status=410)
@@ -232,7 +236,7 @@ def perform_download(request, token, original_uuid):
         file_name = shared_file.file_name
         file_content = StorageInterface.get_file_content(file_name)
         if not file_content:
-            raise Http404("File not found in storage.")
+            return render(request, 'link_expired.html', status=404)
 
         if shared_file.encryption_key:
             decrypted_data = decrypt_file_content(file_content, shared_file.encryption_key)
@@ -249,5 +253,5 @@ def perform_download(request, token, original_uuid):
 
     except Exception as e:
         if settings.DEBUG:
-            raise Http404(f"File could not be read: {str(e)}")
-        raise Http404("File could not be read.")
+            print(f"Download error: {e}")
+        return render(request, 'link_expired.html', status=404)
