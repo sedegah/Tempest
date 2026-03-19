@@ -534,7 +534,7 @@
   <div id="loader">
     <div class="loader-content">
       <div class="loader-logo-wrapper">
-        <img src="{% static 'favicons/android-chrome-192x192.png' %}" alt="Tempest" class="loader-logo">
+        <i data-lucide="zap" class="loader-logo"></i>
       </div>
       <h1 class="loader-text">Tempest</h1>
       <div class="loader-bar">
@@ -553,7 +553,7 @@
 
   <nav>
     <a href="{% url 'landing' %}" class="nav-logo">
-      <img src="{% static 'favicons/favicon-32x32.png' %}" alt="" style="width:20px;height:20px;">
+      <i data-lucide="zap" class="icon" style="width:20px;height:20px;color:var(--accent)"></i>
       <span>Tempest</span>
     </a>
     <ul class="nav-links">
@@ -575,7 +575,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="{% url 'landing' %}" class="nav-logo">
-          <img src="{% static 'favicons/favicon-32x32.png' %}" alt="" style="width:19px;height:19px;">
+          <i data-lucide="zap" class="icon" style="width:19px;height:19px;color:var(--accent)"></i>
           <span>Tempest</span>
         </a>
         <p>Secure, self-destructing file sharing with Django and Cloudflare. Files that vanish in a flash.</p>

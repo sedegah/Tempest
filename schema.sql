@@ -14,7 +14,19 @@ CREATE TABLE shared_files (
     password TEXT
 );
 
-CREATE TABLE access_logs (
+CREATE TABLE IF NOT EXISTS short_links (
+    id TEXT PRIMARY KEY,
+    code TEXT UNIQUE NOT NULL,
+    shared_file_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT,
+    max_downloads INTEGER DEFAULT 1,
+    download_count INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    FOREIGN KEY (shared_file_id) REFERENCES shared_files (id)
+);
+
+CREATE TABLE IF NOT EXISTS access_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     shared_file_id TEXT NOT NULL,
     accessed_at DATETIME NOT NULL,
