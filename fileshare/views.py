@@ -13,6 +13,8 @@ from .forms import UploadForm
 from .interfaces import StorageInterface, DBInterface
 from werkzeug.security import generate_password_hash, check_password_hash
 from django_ratelimit.decorators import ratelimit
+from links.models import ShortLink
+from links.interfaces import ShortLinkDBInterface
 
 def get_shared_file_or_404(original_uuid):
     shared_file = DBInterface.get_file_by_uuid(original_uuid)
@@ -122,8 +124,11 @@ def upload_view(request):
             
             DBInterface.create_shared_file(shared_file)
             
+            # Create a ShortLink for this file
+            short_link = ShortLink(shared_file_id=shared_file.id)
+            ShortLinkDBInterface.create_short_link(short_link)
+            
             secure_token = get_obfuscated_token(shared_file.token)
-            # URL requires original_uuid which corresponds to shared_file.id
             return redirect('success', token=secure_token, original_uuid=shared_file.id)
     else:
         form = UploadForm()
@@ -137,8 +142,19 @@ def success_view(request, token, original_uuid):
     if token != expected_token:
         raise Http404()
         
-    link = request.build_absolute_uri(f'/download/{token}/{original_uuid}/')
-    return render(request, 'success.html', {'link': link, 'file': shared_file})
+    # Fetch associated short link
+    sql = "SELECT code FROM short_links WHERE shared_file_id = ? ORDER BY created_at DESC LIMIT 1"
+    from fileshare.interfaces import D1Client
+    res = D1Client.execute(sql, [shared_file.id])
+    results = res.get("results", [])
+    
+    if results:
+        short_code = results[0]["code"]
+        short_url = request.build_absolute_uri(f'/d/{short_code}/')
+    else:
+        short_url = request.build_absolute_uri(f'/download/{token}/{original_uuid}/')
+
+    return render(request, 'success.html', {'link': short_url, 'file': shared_file})
 
 @ratelimit(key='ip', rate='20/m', block=True)
 def download_view(request, token, original_uuid):
