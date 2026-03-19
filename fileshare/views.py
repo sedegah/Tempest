@@ -96,7 +96,7 @@ def upload_view(request):
             hashed_password = generate_password_hash(raw_password) if raw_password else None
             
             expires_in_hours = float(form.cleaned_data.get('expires_in_hours', 24))
-            expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_in_hours)
+            expires_at = timezone.now() + timedelta(hours=expires_in_hours)
             
             uploaded_file = request.FILES['file']
             file_name = f"{file_id}_{uploaded_file.name}"
