@@ -523,6 +523,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 
+{% if request.resolver_match.url_name in 'landing,success,download' %}
 <body class="loading">
   <div id="loader">
     <div class="loader-content">
@@ -535,6 +536,9 @@
       </div>
     </div>
   </div>
+{% else %}
+<body>
+{% endif %}
 
   <div id="cursor-follower"></div>
 
@@ -657,7 +661,7 @@
       const loader = document.getElementById('loader');
       const body = document.body;
       
-      // Minimum display time of 500ms
+      // Minimum display time of 1500ms
       setTimeout(() => {
         if (loader) {
           loader.classList.add('fade-out');
@@ -667,7 +671,7 @@
             loader.remove();
           }, 600);
         }
-      }, 500);
+      }, 1500);
     });
   </script>
   {% block extra_js %}{% endblock %}
