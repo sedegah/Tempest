@@ -2,7 +2,8 @@
 import uuid
 import secrets
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
 from typing import Optional
 
 @dataclass
@@ -24,8 +25,8 @@ class SharedFile:
     original_name: str = ""
     
     # Temporal Control
-    uploaded_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    expires_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    uploaded_at: datetime = field(default_factory=timezone.now)
+    expires_at: datetime = field(default_factory=timezone.now)
     
     # Download Quota Boundaries
     max_downloads: int = 1
@@ -52,7 +53,7 @@ class SharedFile:
         """
         Calculates if the file's strict maximum limits (TTL or Quotas) have been breached.
         """
-        now = datetime.now(timezone.utc)
+        now = timezone.now()
         return now >= self.expires_at or self.download_count >= self.max_downloads
 
 
@@ -62,7 +63,7 @@ class AccessLog:
     Independent metrics logging user-agent access requests mapping to a given SharedFile.
     """
     shared_file_id: str
-    accessed_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    accessed_at: datetime = field(default_factory=timezone.now)
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
     status: str = "success"

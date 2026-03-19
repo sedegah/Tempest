@@ -115,7 +115,7 @@ def upload_view(request):
                 token=file_token,
                 file_name=file_name,
                 original_name=uploaded_file.name,
-                uploaded_at=datetime.now(timezone.utc),
+                uploaded_at=timezone.now(),
                 expires_at=expires_at,
                 max_downloads=form.cleaned_data.get('max_downloads', 1),
                 download_count=0,

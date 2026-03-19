@@ -4,7 +4,8 @@ import uuid
 import json
 import boto3
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -152,7 +153,7 @@ class DBInterface:
 
     @staticmethod
     def get_expired_files():
-        now = datetime.now(timezone.utc).isoformat()
+        now = timezone.now().isoformat()
         sql = "SELECT * FROM shared_files WHERE expires_at < ?"
         res = D1Client.execute(sql, [now])
         files = []
@@ -177,7 +178,7 @@ class DBInterface:
             INSERT INTO access_logs (shared_file_id, accessed_at, ip_address, user_agent, status)
             VALUES (?, ?, ?, ?, ?)
         """
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = timezone.now().isoformat()
         D1Client.execute(sql, [shared_file.id, timestamp, ip_address, user_agent, status])
         return True
 
