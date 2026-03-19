@@ -43,6 +43,11 @@ class SharedFile:
         """Helper property explicitly tracking the current download count."""
         return self.download_count
 
+    @property
+    def display_name(self):
+        """Returns the user-facing filename for templates."""
+        return self.original_name
+
     def is_expired(self):
         """
         Calculates if the file's strict maximum limits (TTL or Quotas) have been breached.
