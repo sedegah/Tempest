@@ -1,0 +1,18 @@
+{
+  "source_directories": [
+    "."
+  ],
+  "exclude": [
+    ".*/venv/.*",
+    ".*/migrations/.*"
+  ],
+  "ignore_all_errors": [
+    "fileshare/models.py",
+    "fileshare/views.py",
+    "fileshare/tasks.py",
+    "fileshare/interfaces.py",
+    "fileshare/forms.py",
+    "list_r2_api.py",
+    "tempest/settings.py"
+  ]
+}

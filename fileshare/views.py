@@ -1,6 +1,10 @@
+# pyre-ignore-all-errors
 import os
 import hashlib
-from django.shortcuts import render, get_object_or_404, redirect
+import uuid
+import secrets
+from datetime import datetime, timezone, timedelta
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.conf import settings
 from cryptography.fernet import Fernet
@@ -10,8 +14,14 @@ from .interfaces import StorageInterface, DBInterface
 from django.contrib.auth.hashers import make_password, check_password
 from django_ratelimit.decorators import ratelimit
 
+def get_shared_file_or_404(original_uuid):
+    shared_file = DBInterface.get_file_by_uuid(original_uuid)
+    if not shared_file:
+        raise Http404("File not found")
+    return shared_file
+
 def file_status_view(request, token, original_uuid):
-    shared_file = get_object_or_404(SharedFile, token=original_uuid)
+    shared_file = get_shared_file_or_404(original_uuid)
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -46,7 +56,6 @@ def documentation_view(request):
 def api_reference_view(request):
     return render(request, 'api_reference.html')
 
-
 def get_encryption_key(file_specific_key=None):
     if file_specific_key:
         return file_specific_key.encode('utf-8')
@@ -78,33 +87,51 @@ def upload_view(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
-            shared_file = form.save(commit=False)
-            shared_file.original_name = request.FILES['file'].name
-            shared_file.original_name = request.FILES['file'].name
+            file_id = str(uuid.uuid4())
+            file_token = secrets.token_urlsafe(8)[:12]
             
             raw_password = form.cleaned_data.get('password')
-            if raw_password:
-                shared_file.password = make_password(raw_password)
-
+            hashed_password = make_password(raw_password) if raw_password else None
+            
+            expires_in_hours = int(form.cleaned_data.get('expires_in_hours', 24))
+            expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_in_hours)
+            
+            uploaded_file = request.FILES['file']
+            file_name = f"{file_id}_{uploaded_file.name}"
+            
+            encryption_key = None
             encrypt = form.cleaned_data.get('encrypt', False)
             if encrypt:
-                encrypted_data, file_key = encrypt_file(request.FILES['file'])
-                
-                from django.core.files.base import ContentFile
-                shared_file.file.save(request.FILES['file'].name, ContentFile(encrypted_data), save=False)
-                shared_file.encryption_key = file_key
+                encrypted_data, encryption_key = encrypt_file(uploaded_file)
+                StorageInterface.upload_file(file_name, encrypted_data)
+            else:
+                StorageInterface.upload_file(file_name, uploaded_file.read())
+
+            shared_file = SharedFile(
+                id=file_id,
+                token=file_token,
+                file_name=file_name,
+                original_name=uploaded_file.name,
+                uploaded_at=datetime.now(timezone.utc),
+                expires_at=expires_at,
+                max_downloads=form.cleaned_data.get('max_downloads', 1),
+                download_count=0,
+                encryption_key=encryption_key,
+                password=hashed_password
+            )
             
-            shared_file.save()
+            DBInterface.create_shared_file(shared_file)
             
             secure_token = get_obfuscated_token(shared_file.token)
-            return redirect('success', token=secure_token, original_uuid=shared_file.token)
+            # URL requires original_uuid which corresponds to shared_file.id
+            return redirect('success', token=secure_token, original_uuid=shared_file.id)
     else:
         form = UploadForm()
     
     return render(request, 'upload.html', {'form': form})
 
 def success_view(request, token, original_uuid):
-    shared_file = get_object_or_404(SharedFile, token=original_uuid)
+    shared_file = get_shared_file_or_404(original_uuid)
     
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
@@ -115,24 +142,17 @@ def success_view(request, token, original_uuid):
 
 @ratelimit(key='ip', rate='20/m', block=True)
 def download_view(request, token, original_uuid):
-    shared_file = get_object_or_404(SharedFile, token=original_uuid)
+    shared_file = get_shared_file_or_404(original_uuid)
     
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
         raise Http404()
     
-    
-    log = AccessLog.objects.create(
-        shared_file=shared_file,
-        ip_address=get_client_ip(request),
-        user_agent=request.META.get('HTTP_USER_AGENT', '')
-    )
-
     if shared_file.is_expired():
-        log.success = False
-        log.save()
+        DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "expired")
         return render(request, 'link_expired.html', status=410)
 
+    # Initial page load - no password challenge yet unless required
     if shared_file.password:
         attempts = int(request.session.get(f'pwd_attempts_{original_uuid}', 0))
         if request.method == 'POST':
@@ -140,6 +160,9 @@ def download_view(request, token, original_uuid):
             if not check_password(pwd, shared_file.password):
                 attempts += 1
                 request.session[f'pwd_attempts_{original_uuid}'] = attempts
+                
+                DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "auth_failed")
+                
                 if attempts >= 3:
                     request.session.pop(f'pwd_attempts_{original_uuid}', None)
                     DBInterface.delete_file_record(shared_file)
@@ -154,10 +177,8 @@ def download_view(request, token, original_uuid):
                     'shared_file': shared_file, 'panel': 'auth',
                 })
             else:
-                # Correct password
                 request.session[f'auth_ok_{original_uuid}'] = True
                 request.session.pop(f'pwd_attempts_{original_uuid}', None)
-                # Success - will proceed to render download.html
         else:
             return render(request, 'download_auth.html', {
                 'token': token, 'original_uuid': original_uuid,
@@ -165,7 +186,6 @@ def download_view(request, token, original_uuid):
                 'attempts': attempts, 'attempts_remaining': 3 - attempts,
             })
 
-    # If already authenticated or no password, show landing page
     return render(request, 'download.html', {
         'token': token,
         'original_uuid': original_uuid,
@@ -174,31 +194,23 @@ def download_view(request, token, original_uuid):
 
 @ratelimit(key='ip', rate='10/m', block=True)
 def perform_download(request, token, original_uuid):
-    shared_file = get_object_or_404(SharedFile, token=original_uuid)
+    shared_file = get_shared_file_or_404(original_uuid)
     
     expected_token = get_obfuscated_token(shared_file.token)
     if token != expected_token:
         raise Http404()
     
-    # Check if download is still valid (e.g. not one-time used already)
     if shared_file.is_expired():
          return render(request, 'link_expired.html', status=410)
 
-    # Check password if applicable (session check)
     if shared_file.password:
-        # Check if they have the session flag set by download_view authentication
-        # We need a way to track successful auth. Let's use a session key.
         if not request.session.get(f'auth_ok_{original_uuid}'):
              return redirect('download', token=token, original_uuid=original_uuid)
 
     try:
-        file_name = shared_file.file.name
+        file_name = shared_file.file_name
         file_content = StorageInterface.get_file_content(file_name)
         if not file_content:
-            if settings.DEBUG:
-                from django.core.files.storage import default_storage
-                last_url = getattr(default_storage, 'last_failed_url', 'Unknown URL')
-                raise Http404(f"File not found in storage: {file_name} at {last_url}")
             raise Http404("File not found in storage.")
 
         if shared_file.encryption_key:
@@ -207,18 +219,11 @@ def perform_download(request, token, original_uuid):
         else:
             response = HttpResponse(file_content, content_type='application/octet-stream')
 
-        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_name)}"'
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(shared_file.original_name)}"'
         
-        # Increment download count (multi-download logic)
         DBInterface.increment_download_count(shared_file)
         
-        # Log the final download success
-        AccessLog.objects.create(
-            shared_file=shared_file,
-            ip_address=get_client_ip(request),
-            user_agent=request.META.get('HTTP_USER_AGENT', ''),
-            success=True
-        )
+        DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "success")
         return response
 
     except Exception as e:

@@ -1,42 +1,69 @@
+# pyre-ignore-all-errors
 import uuid
-from django.db import models
-from django.utils import timezone
+import secrets
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Optional
 
-class SharedFile(models.Model):
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    file = models.FileField(upload_to='uploads/')
-    original_name = models.CharField(max_length=255, blank=True, null=True)
-    original_name = models.CharField(max_length=255, blank=True, null=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
-    max_downloads = models.PositiveIntegerField(default=1)
-    download_count = models.PositiveIntegerField(default=0)
-    encryption_key = models.CharField(max_length=128, blank=True, null=True)
-    password = models.CharField(max_length=256, blank=True, null=True)
+@dataclass
+class SharedFile:
+    """
+    Represents an independently uploaded file object.
+    Replaces Django ORM (`models.Model`) to support JSON HTTP bindings for Cloudflare D1.
+    """
+    # Primary Key
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    
+    # 12-char Obfuscated Token (Unique lookup parameter)
+    token: str = field(default_factory=lambda: secrets.token_urlsafe(8)[:12])
+    
+    # Storage Backend Filename (R2 Blob Key)
+    file_name: str = ""
+    
+    # User's Local Uploaded Filename
+    original_name: str = ""
+    
+    # Temporal Control
+    uploaded_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # Download Quota Boundaries
+    max_downloads: int = 1
+    download_count: int = 0
+    
+    # Optional Security Tiers
+    encryption_key: Optional[str] = field(default=None, repr=False)
+    password: Optional[str] = field(default=None, repr=False)
+
+    def __str__(self):
+        return f"<SharedFile: {self.original_name} (Expires: {self.expires_at.strftime('%Y-%m-%d %H:%M')})>"
+
+    @property
+    def downloaded(self):
+        """Helper property explicitly tracking the current download count."""
+        return self.download_count
 
     def is_expired(self):
-        return timezone.now() > self.expires_at or self.download_count >= self.max_downloads
+        """
+        Calculates if the file's strict maximum limits (TTL or Quotas) have been breached.
+        """
+        now = datetime.now(timezone.utc)
+        return now >= self.expires_at or self.download_count >= self.max_downloads
 
-    @property
-    def display_name(self):
-        import os
-        return self.original_name or os.path.basename(self.file.name)
 
-    @property
-    def display_name(self):
-        import os
-        return self.original_name or os.path.basename(self.file.name)
+@dataclass
+class AccessLog:
+    """
+    Independent metrics logging user-agent access requests mapping to a given SharedFile.
+    """
+    shared_file_id: str
+    accessed_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    status: str = "success"
+    
+    # D1 Autoincrement PK
+    id: Optional[int] = None
 
     def __str__(self):
-        return f"File {self.token} (Expires: {self.expires_at})"
-
-class AccessLog(models.Model):
-    shared_file = models.ForeignKey(SharedFile, on_delete=models.CASCADE, related_name='access_logs')
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.CharField(max_length=512, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    success = models.BooleanField(default=True)
-
-    def __str__(self):
-        status = "Success" if self.success else "Failed"
-        return f"{status} Access to {self.shared_file.token} at {self.timestamp}"
+        return f"<AccessLog: {self.shared_file_id} - {self.status} (IP: {self.ip_address})>"

@@ -20,15 +20,15 @@ DOWNLOAD_CHOICES = [
     (100, '100 Downloads'),
 ]
 
-class UploadForm(forms.ModelForm):
-    expires_in_hours = forms.ChoiceField(choices=EXPIRY_CHOICES, initial=24, label="Expires In")
-    max_downloads = forms.ChoiceField(choices=DOWNLOAD_CHOICES, initial=1, label="Max Downloads")
-    password = forms.CharField(widget=forms.PasswordInput(), required=False, help_text="Optional: Protect file with a password")
-    encrypt = forms.BooleanField(required=False, initial=True, label="Encrypt File", help_text="Enable End-to-End Encryption (AES-256)")
-
-    class Meta:
-        model = SharedFile
-        fields = ['file', 'password', 'max_downloads']
+class UploadForm(forms.Form):
+    file = forms.FileField()
+    password = forms.CharField(max_length=128, required=False)
+    encrypt = forms.BooleanField(required=False, initial=True)
+    expires_in_hours = forms.ChoiceField(
+        choices=[(1, '1 Hour'), (24, '24 Hours'), (72, '3 Days')],
+        initial=24
+    )
+    max_downloads = forms.IntegerField(min_value=1, max_value=100, initial=1)
         
     def clean_file(self):
         file = self.cleaned_data.get('file')

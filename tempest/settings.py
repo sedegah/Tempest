@@ -60,8 +60,19 @@ WSGI_APPLICATION = 'tempest.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': ':memory:',
     }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+MIGRATION_MODULES = {
+    'auth': None,
+    'contenttypes': None,
+    'default': None,
+    'sessions': None,
+    'fileshare': None,
+    'admin': None,
 }
 
 CACHES = {
