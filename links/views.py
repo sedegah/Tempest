@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from datetime import datetime, timezone
 from .interfaces import ShortLinkDBInterface
 from fileshare.interfaces import DBInterface
+from fileshare.views import get_obfuscated_token
 
 def short_redirect_view(request, code):
     """
@@ -44,10 +45,6 @@ def short_redirect_view(request, code):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
     DBInterface.log_access(shared_file, ip_address, user_agent, status="success")
     
-    # Build the redirection URL
-    # Redirect to the download authentication page or download page
-    # If the file has a password, we redirect to download_auth
-    if shared_file.password:
-        return redirect('download_auth', token=shared_file.token)
-    else:
-        return redirect('download', token=shared_file.token)
+    # Redirect to the download page (which handles its own auth)
+    secure_token = get_obfuscated_token(shared_file.token)
+    return redirect('download', token=secure_token, original_uuid=shared_file.id)
