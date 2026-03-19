@@ -8,3 +8,4 @@ django-storages
 boto3
 requests
 gunicorn
+werkzeug

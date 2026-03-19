@@ -12,11 +12,7 @@ if 'RENDER_EXTERNAL_HOSTNAME' in os.environ:
     ALLOWED_HOSTS.append(os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'fileshare',
@@ -27,8 +23,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -48,8 +42,6 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -67,12 +59,8 @@ DATABASES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 MIGRATION_MODULES = {
-    'auth': None,
-    'contenttypes': None,
-    'default': None,
     'sessions': None,
     'fileshare': None,
-    'admin': None,
 }
 
 CACHES = {

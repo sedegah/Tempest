@@ -11,7 +11,7 @@ from cryptography.fernet import Fernet
 from .models import SharedFile, AccessLog
 from .forms import UploadForm
 from .interfaces import StorageInterface, DBInterface
-from django.contrib.auth.hashers import make_password, check_password
+from werkzeug.security import generate_password_hash, check_password_hash
 from django_ratelimit.decorators import ratelimit
 
 def get_shared_file_or_404(original_uuid):
@@ -91,7 +91,7 @@ def upload_view(request):
             file_token = secrets.token_urlsafe(8)[:12]
             
             raw_password = form.cleaned_data.get('password')
-            hashed_password = make_password(raw_password) if raw_password else None
+            hashed_password = generate_password_hash(raw_password) if raw_password else None
             
             expires_in_hours = int(form.cleaned_data.get('expires_in_hours', 24))
             expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_in_hours)
@@ -157,7 +157,7 @@ def download_view(request, token, original_uuid):
         attempts = int(request.session.get(f'pwd_attempts_{original_uuid}', 0))
         if request.method == 'POST':
             pwd = request.POST.get('password', '')
-            if not check_password(pwd, shared_file.password):
+            if not check_password_hash(shared_file.password, pwd):
                 attempts += 1
                 request.session[f'pwd_attempts_{original_uuid}'] = attempts
                 

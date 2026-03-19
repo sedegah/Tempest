@@ -4,3 +4,11 @@ venv/
 db.sqlite3
 __pycache__/
 *.pyc
+
+# Scratch/utility scripts (not part of the app)
+set_r2_lifecycle.py
+set_r2_cf_api.py
+test_r2.py
+test_r2_api.py
+test_d1.py
+list_r2_api.py
