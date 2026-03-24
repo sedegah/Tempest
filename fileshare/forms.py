@@ -21,7 +21,7 @@ DOWNLOAD_CHOICES = [
 ]
 
 class UploadForm(forms.Form):
-    file = forms.FileField()
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
     password = forms.CharField(max_length=128, required=False)
     encrypt = forms.BooleanField(required=False, initial=True)
     expires_in_hours = forms.ChoiceField(
@@ -38,15 +38,21 @@ class UploadForm(forms.Form):
     max_downloads = forms.IntegerField(min_value=1, max_value=100, initial=1)
         
     def clean_file(self):
-        file = self.cleaned_data.get('file')
-        if file:
-            if file.size > MAX_FILE_SIZE:
-                raise ValidationError("File size must be under 50MB.")
+        files = self.files.getlist('file')
+        if not files:
+            raise ValidationError("Please select at least one file.")
             
-            ext = os.path.splitext(file.name)[1].lower()
+        total_size = 0
+        for f in files:
+            total_size += f.size
+            if total_size > MAX_FILE_SIZE:
+                raise ValidationError("Total file size must be under 100MB.")
+                
+            ext = os.path.splitext(f.name)[1].lower()
             if ext in ['.exe', '.bat', '.sh', '.bin', '.cmd', '.msi']:
-                raise ValidationError("Executable files are not allowed.")
-        return file
+                raise ValidationError(f"Executable files are not allowed ({f.name}).")
+                
+        return files
 
     def save(self, commit=True):
         instance = super().save(commit=False)

@@ -99,22 +99,47 @@ def upload_view(request):
             expires_in_hours = float(form.cleaned_data.get('expires_in_hours', 24))
             expires_at = timezone.now() + timedelta(hours=expires_in_hours)
             
-            uploaded_file = request.FILES['file']
-            file_name = f"{file_id}_{uploaded_file.name}"
+            uploaded_files = request.FILES.getlist('file')
             
             encryption_key = None
             encrypt = form.cleaned_data.get('encrypt', False)
-            if encrypt:
-                encrypted_data, encryption_key = encrypt_file(uploaded_file)
-                StorageInterface.upload_file(file_name, encrypted_data)
+            
+            if len(uploaded_files) > 1:
+                import io
+                import zipfile
+                
+                zip_buffer = io.BytesIO()
+                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    for uf in uploaded_files:
+                        uf.seek(0)
+                        zip_file.writestr(uf.name, uf.read())
+                
+                zip_buffer.seek(0)
+                
+                original_name = "Archive.zip"
+                file_name = f"{file_id}_Archive.zip"
+                
+                if encrypt:
+                    encrypted_data, encryption_key = encrypt_file(zip_buffer)
+                    StorageInterface.upload_file(file_name, encrypted_data)
+                else:
+                    StorageInterface.upload_file(file_name, zip_buffer.read())
             else:
-                StorageInterface.upload_file(file_name, uploaded_file.read())
+                uploaded_file = uploaded_files[0]
+                original_name = uploaded_file.name
+                file_name = f"{file_id}_{uploaded_file.name}"
+                
+                if encrypt:
+                    encrypted_data, encryption_key = encrypt_file(uploaded_file)
+                    StorageInterface.upload_file(file_name, encrypted_data)
+                else:
+                    StorageInterface.upload_file(file_name, uploaded_file.read())
 
             shared_file = SharedFile(
                 id=file_id,
                 token=file_token,
                 file_name=file_name,
-                original_name=uploaded_file.name,
+                original_name=original_name,
                 uploaded_at=timezone.now(),
                 expires_at=expires_at,
                 max_downloads=form.cleaned_data.get('max_downloads', 1),
