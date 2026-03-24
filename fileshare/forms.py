@@ -20,8 +20,24 @@ DOWNLOAD_CHOICES = [
     (100, '100 Downloads'),
 ]
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput(attrs={'multiple': True}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
 class UploadForm(forms.Form):
-    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    file = MultipleFileField()
     password = forms.CharField(max_length=128, required=False)
     encrypt = forms.BooleanField(required=False, initial=True)
     expires_in_hours = forms.ChoiceField(
