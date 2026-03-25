@@ -130,8 +130,8 @@ class DBInterface:
             original_name=row["original_name"],
             uploaded_at=datetime.fromisoformat(row["uploaded_at"].replace("Z", "+00:00")),
             expires_at=datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00")),
-            max_downloads=row["max_downloads"],
-            download_count=row["download_count"],
+            max_downloads=int(row["max_downloads"]),
+            download_count=int(row["download_count"]),
             encryption_key=row["encryption_key"],
             password=row["password"]
         )
@@ -165,8 +165,8 @@ class DBInterface:
                 original_name=row["original_name"],
                 uploaded_at=datetime.fromisoformat(row["uploaded_at"].replace("Z", "+00:00")),
                 expires_at=datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00")),
-                max_downloads=row["max_downloads"],
-                download_count=row["download_count"],
+                max_downloads=int(row["max_downloads"]),
+                download_count=int(row["download_count"]),
                 encryption_key=row["encryption_key"],
                 password=row["password"]
             ))

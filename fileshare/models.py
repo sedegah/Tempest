@@ -49,12 +49,22 @@ class SharedFile:
         """Returns the user-facing filename for templates."""
         return self.original_name
 
+    def get_expiration_reason(self):
+        """
+        Returns a human-readable reason if the file is expired, otherwise None.
+        """
+        now = timezone.now()
+        if now >= self.expires_at:
+            return f"File expired by time limit (Expired at: {self.expires_at.strftime('%Y-%m-%d %H:%M:%S')} UTC, Current: {now.strftime('%Y-%m-%d %H:%M:%S')} UTC)"
+        if self.download_count >= self.max_downloads:
+            return f"Download limit reached ({self.download_count}/{self.max_downloads} downloads used)"
+        return None
+
     def is_expired(self):
         """
         Calculates if the file's strict maximum limits (TTL or Quotas) have been breached.
         """
-        now = timezone.now()
-        return now >= self.expires_at or self.download_count >= self.max_downloads
+        return self.get_expiration_reason() is not None
 
 
 @dataclass

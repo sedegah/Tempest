@@ -44,8 +44,8 @@ class ShortLinkDBInterface:
             shared_file_id=row["shared_file_id"],
             created_at=datetime.fromisoformat(row["created_at"].replace("Z", "+00:00")),
             expires_at=datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00")) if row["expires_at"] else None,
-            max_downloads=row["max_downloads"],
-            download_count=row["download_count"],
+            max_downloads=int(row["max_downloads"]),
+            download_count=int(row["download_count"]),
             is_active=bool(row["is_active"])
         )
 

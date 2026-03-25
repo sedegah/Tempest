@@ -196,9 +196,10 @@ def download_view(request, token, original_uuid):
     if token != expected_token:
         return render(request, 'link_expired.html', status=404)
     
-    if shared_file.is_expired():
+    file_expired_reason = shared_file.get_expiration_reason()
+    if file_expired_reason:
         DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "expired")
-        return render(request, 'link_expired.html', status=410)
+        return render(request, 'link_expired.html', {"reason": file_expired_reason}, status=410)
 
     # Initial page load - no password challenge yet unless required
     if shared_file.password:
@@ -250,8 +251,9 @@ def perform_download(request, token, original_uuid):
     if token != expected_token:
         return render(request, 'link_expired.html', status=404)
     
-    if shared_file.is_expired():
-         return render(request, 'link_expired.html', status=410)
+    file_expired_reason = shared_file.get_expiration_reason()
+    if file_expired_reason:
+         return render(request, 'link_expired.html', {"reason": file_expired_reason}, status=410)
 
     if shared_file.password:
         if not request.session.get(f'auth_ok_{original_uuid}'):

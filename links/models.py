@@ -35,13 +35,21 @@ class ShortLink:
     def __str__(self):
         return f"<ShortLink: {self.code} -> {self.shared_file_id}>"
 
+    def get_expiration_reason(self):
+        """
+        Returns a human-readable reason if the short link itself has expired.
+        """
+        now = timezone.now()
+        if self.expires_at and now >= self.expires_at:
+            return f"Link expired by time limit (Expired at: {self.expires_at.strftime('%Y-%m-%d %H:%M:%S')} UTC, Current: {now.strftime('%Y-%m-%d %H:%M:%S')} UTC)"
+        if self.download_count >= self.max_downloads:
+            return f"Download limit reached ({self.download_count}/{self.max_downloads} downloads used)"
+        if not self.is_active:
+            return "This link has been manually deactivated."
+        return None
+
     def is_expired(self):
         """
         Calculates if the short link itself (independent of the file) has expired.
         """
-        now = timezone.now()
-        if self.expires_at and now >= self.expires_at:
-            return True
-        if self.download_count >= self.max_downloads:
-            return True
-        return not self.is_active
+        return self.get_expiration_reason() is not None

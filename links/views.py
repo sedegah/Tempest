@@ -25,17 +25,15 @@ def short_redirect_view(request, code):
     if not shared_file:
         return HttpResponseNotFound("The file associated with this link no longer exists.")
         
-    # Validation logic (Link level)
-    now = timezone.now()
-    if link.expires_at and now >= link.expires_at:
-        return render(request, 'link_expired.html', {"reason": "Link expired by time limit"}, status=403)
-        
-    if link.download_count >= link.max_downloads:
-        return render(request, 'link_expired.html', {"reason": f"Download limit reached ({link.download_count}/{link.max_downloads})"}, status=403)
+    # Validation logic (ShortLink level)
+    link_expired_reason = link.get_expiration_reason()
+    if link_expired_reason:
+        return render(request, 'link_expired.html', {"reason": link_expired_reason}, status=403)
 
     # Validation logic (File level inheritance)
-    if shared_file.is_expired():
-        return render(request, 'link_expired.html', status=403)
+    file_expired_reason = shared_file.get_expiration_reason()
+    if file_expired_reason:
+        return render(request, 'link_expired.html', {"reason": f"Associated file: {file_expired_reason}"}, status=403)
 
     # Increment usage count for the link
     ShortLinkDBInterface.increment_usage(link)
