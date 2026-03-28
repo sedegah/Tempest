@@ -4,62 +4,43 @@
 
 {% block content %}
 <style>
-  .contact-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 60px;
-  }
-  .pill-badge {
+  .contact-badge {
     display: inline-flex;
     align-items: center;
-    padding: 6px 16px;
+    padding: 8px 16px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--accent);
-    margin-bottom: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 48px;
+    gap: 10px;
   }
-  .contact-header h1 {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(40px, 6vw, 64px);
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 24px;
-    letter-spacing: -0.03em;
+  .contact-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #00b368;
+    box-shadow: 0 0 8px rgba(0, 179, 104, 0.4);
   }
-  .contact-header h1 em {
-    font-style: normal;
-    color: var(--blue);
-  }
-  .contact-header p {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.7;
-    font-weight: 400;
-  }
-  
   .contact-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 24px;
+    padding: 24px 32px;
     margin-bottom: 16px;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, border-color 0.2s;
     display: flex;
     align-items: flex-start;
     gap: 24px;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   }
   .contact-card:hover {
     transform: translateY(-2px);
-    border-color: var(--blue);
-    box-shadow: 0 8px 30px rgba(77, 166, 255, 0.08);
+    border-color: var(--accent);
   }
   .contact-icon-box {
     width: 52px;
@@ -90,17 +71,16 @@
     padding-top: 4px;
   }
   .contact-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
   .contact-value {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
   }
   .contact-desc {
     font-size: 14px;
@@ -108,14 +88,17 @@
   }
 </style>
 
-<section style="padding: 100px 44px; max-width: 900px; margin: 0 auto; min-height: 70vh;">
-  <div class="contact-header">
-    <div class="pill-badge">We're here to help</div>
-    <h1>Get in touch<br><em>with Tempest.</em></h1>
-    <p>Have a question about your files, our technology, or anything else? Reach out on any of the channels below and we'll get back to you quickly.</p>
+<section style="padding: 120px 44px; max-width: 900px; margin: 0 auto; min-height: 70vh;">
+  <p class="section-label">Get in touch</p>
+  <h1 class="section-title">Contact <em>Us</em></h1>
+  <p class="section-sub" style="margin-bottom: 24px;">Have a question about your files, our technology, or anything else? Reach out to us on any of the channels below and we'll get back to you quickly.</p>
+  
+  <div class="contact-badge">
+    <div class="contact-dot"></div>
+    <span><strong>Typical response time:</strong> within a few hours on WhatsApp, 24hrs by email.</span>
   </div>
   
-  <div style="max-width: 600px; margin: 0 auto;">
+  <div style="max-width: 600px;">
     <!-- Email -->
     <a href="mailto:sedegahkim@gmail.com" class="contact-card">
       <div class="contact-icon-box icon-email">
