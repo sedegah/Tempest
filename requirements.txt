@@ -8,4 +8,5 @@ django-storages
 boto3
 requests
 gunicorn
+whitenoise
 werkzeug
