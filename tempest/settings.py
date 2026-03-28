@@ -43,6 +43,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://tempest-u-oiya.fly.dev",
+]
+
 ROOT_URLCONF = 'tempest.urls'
 
 TEMPLATES = [
