@@ -21,12 +21,31 @@
   @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   .cat-section { padding: 120px 44px; max-width: 1400px; margin: 0 auto; }
-  .cat-scroll { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin-top: 60px; }
-  .cat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; width: 100%; max-width: 320px; flex: 1 1 300px; }
-  .cat-card:hover { transform: translateY(-8px); border-color: var(--accent); background: var(--surface2); }
-  .cat-card-img { height: 180px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
-  .cat-card-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
-  .cat-card-name { font-size: 18px; font-weight: 700; }
+  .cat-scroll { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; margin-top: 60px; }
+  
+  .cat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 24px; text-decoration: none; color: inherit; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 320px; }
+  .cat-card:hover { transform: translateY(-6px); border-color: rgba(240,201,58,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  
+  /* Layout: 2 top cards, 3 bottom cards */
+  .cat-card:nth-child(1), .cat-card:nth-child(2) { grid-column: span 3; }
+  .cat-card:nth-child(3), .cat-card:nth-child(4), .cat-card:nth-child(5) { grid-column: span 2; }
+  @media (max-width: 900px) { .cat-card:nth-child(n) { grid-column: span 6; } }
+
+  .cat-card-bg { position: absolute; inset: 0; z-index: 0; opacity: 0.3; transition: opacity 0.5s ease, transform 0.5s ease; width: 100%; height: 100%; }
+  .cat-card:hover .cat-card-bg { opacity: 0.6; transform: scale(1.03); }
+  .cat-card-bg::after { content:''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--surface2) 100%); }
+
+  .cat-card-content { position: relative; z-index: 10; padding: 36px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 40px; }
+  
+  .cat-card-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: rgba(7, 9, 15, 0.6); border: 1px solid rgba(240,201,58,0.15); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.4s, border-color 0.4s; }
+  .cat-card-icon-wrap .icon { width: 26px; height: 26px; color: var(--accent); }
+  .cat-card:hover .cat-card-icon-wrap { transform: scale(1.1); border-color: rgba(240,201,58,0.4); }
+
+  .cat-card-body { margin-top: auto; }
+  .cat-card-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 12px; display: inline-block; }
+  .cat-card-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; color: var(--text); }
+  .cat-card-desc { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 90%; }
+
 
   .faq-section { padding: 100px 44px; max-width: 800px; margin: 0 auto; text-align: center; }
   .faq-header { margin-bottom: 60px; }
@@ -104,39 +123,63 @@
   <p class="section-sub">Built for privacy-first file sharing with enterprise-grade security baked in from day one.</p>
   <div class="cat-scroll">
     <a href="{% url 'features' %}" class="cat-card">
-      <div class="cat-card-img pattern-viz pattern-geometric">
-        <div class="shape-1"></div>
-        <i data-lucide="lock" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65;position:relative;z-index:10"></i>
+      <div class="cat-card-bg pattern-viz pattern-geometric"><div class="shape-1"></div></div>
+      <div class="cat-card-content">
+        <div class="cat-card-icon-wrap"><i data-lucide="lock" class="icon"></i></div>
+        <div class="cat-card-body">
+          <div class="cat-card-tag">Privacy</div>
+          <div class="cat-card-name">End-to-End Encryption</div>
+          <div class="cat-card-desc">Every file is client-side encrypted using secure AES-256 protocols before leaving your device. Your data remains completely opaque to us.</div>
+        </div>
       </div>
-      <div class="cat-card-body"><div class="cat-card-tag">Privacy</div><div class="cat-card-name">End-to-End Encryption</div></div>
     </a>
+    
     <a href="{% url 'features' %}" class="cat-card">
-      <div class="cat-card-img pattern-viz pattern-fiery">
-        <div class="shape-1"></div><div class="shape-2"></div><div class="shape-3"></div>
-        <i data-lucide="flame" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65;position:relative;z-index:10"></i>
+      <div class="cat-card-bg pattern-viz pattern-fiery"><div class="shape-1"></div><div class="shape-2"></div><div class="shape-3"></div></div>
+      <div class="cat-card-content">
+        <div class="cat-card-icon-wrap"><i data-lucide="flame" class="icon"></i></div>
+        <div class="cat-card-body">
+          <div class="cat-card-tag">Ephemeral</div>
+          <div class="cat-card-name">Self-Destruct Links</div>
+          <div class="cat-card-desc">Share with confidence. Links automatically burn themselves out after a single download or a strict time window that you specify.</div>
+        </div>
       </div>
-      <div class="cat-card-body"><div class="cat-card-tag">Ephemeral</div><div class="cat-card-name">Self-Destruct Links</div></div>
     </a>
+    
     <a href="{% url 'tech_stack' %}" class="cat-card">
-      <div class="cat-card-img pattern-viz pattern-waves">
-        <div class="shape-1"></div><div class="shape-2"></div>
-        <i data-lucide="cloud" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65;position:relative;z-index:10"></i>
+      <div class="cat-card-bg pattern-viz pattern-waves"><div class="shape-1"></div><div class="shape-2"></div></div>
+      <div class="cat-card-content">
+        <div class="cat-card-icon-wrap"><i data-lucide="cloud" class="icon"></i></div>
+        <div class="cat-card-body">
+          <div class="cat-card-tag">Infrastructure</div>
+          <div class="cat-card-name">Cloudflare R2 Storage</div>
+          <div class="cat-card-desc">Zero-egress object storage built on Cloudflare's massive global network ensures lightning-fast downloads and robust DDoS resistance everywhere.</div>
+        </div>
       </div>
-      <div class="cat-card-body"><div class="cat-card-tag">Infrastructure</div><div class="cat-card-name">Cloudflare R2 &amp; Workers</div></div>
     </a>
+    
     <a href="{% url 'features' %}" class="cat-card">
-      <div class="cat-card-img pattern-viz pattern-ocean">
-        <div class="shape-1"></div><div class="shape-2"></div>
-        <i data-lucide="scroll-text" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65;position:relative;z-index:10"></i>
+      <div class="cat-card-bg pattern-viz pattern-ocean"><div class="shape-1"></div><div class="shape-2"></div></div>
+      <div class="cat-card-content">
+        <div class="cat-card-icon-wrap"><i data-lucide="scroll-text" class="icon"></i></div>
+        <div class="cat-card-body">
+          <div class="cat-card-tag">Audit</div>
+          <div class="cat-card-name">Full Access Logs</div>
+          <div class="cat-card-desc">Track exactly who viewed your file and when. Stay informed with detailed timestamps and access reports.</div>
+        </div>
       </div>
-      <div class="cat-card-body"><div class="cat-card-tag">Audit</div><div class="cat-card-name">Full Access Logs</div></div>
     </a>
+    
     <a href="{% url 'tech_stack' %}" class="cat-card">
-      <div class="cat-card-img pattern-viz pattern-geometric">
-        <div class="shape-1"></div>
-        <i data-lucide="cpu" class="icon" style="width:42px;height:42px;color:var(--accent);opacity:.65;position:relative;z-index:10"></i>
+      <div class="cat-card-bg pattern-viz pattern-geometric"><div class="shape-1"></div></div>
+      <div class="cat-card-content">
+        <div class="cat-card-icon-wrap"><i data-lucide="cpu" class="icon"></i></div>
+        <div class="cat-card-body">
+          <div class="cat-card-tag">Automation</div>
+          <div class="cat-card-name">Celery Auto-Delete</div>
+          <div class="cat-card-desc">Asynchronous background pipelines guarantee that expired and accessed files are instantly purged from the servers forever.</div>
+        </div>
       </div>
-      <div class="cat-card-body"><div class="cat-card-tag">Automation</div><div class="cat-card-name">Celery Auto-Delete</div></div>
     </a>
   </div>
 </section>
