@@ -36,6 +36,16 @@
   .faq-item.open .faq-a { display: block; }
   .faq-item.open .faq-chevron { transform: rotate(180deg); transition: transform 0.3s; }
 
+  .about-section { padding: 80px 44px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .about-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 24px; }
+  .about-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 700; line-height: 1.1; margin-bottom: 24px; }
+  .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+  .about-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top, rgba(240,201,58,0.05), transparent 60%); pointer-events: none; }
+  .about-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--surface2), var(--border)); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--text); border: 1px solid var(--border); margin-bottom: 20px; font-style: italic; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1; }
+  .about-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; z-index: 1; }
+  .about-role { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; z-index: 1; }
+  .about-bio { color: var(--muted); font-size: 15px; line-height: 1.7; z-index: 1; }
+
   .cta-banner { padding: 120px 44px; max-width: 1200px; margin: 0 auto; background: linear-gradient(135deg, #0e1118, #1a1e26); border: 1px solid var(--border); border-radius: 32px; display: flex; align-items: center; justify-content: space-between; gap: 60px; margin-bottom: 120px; }
   .cta-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 56px); font-weight: 700; line-height: 1.1; margin-top: 12px; }
   .cta-title em { font-style: italic; color: var(--accent); }
@@ -164,6 +174,21 @@
   <div class="faq-item">
     <button class="faq-q" onclick="toggleFaq(this)">Can I use Tempest via API?<i data-lucide="chevron-down" class="faq-chevron icon"></i></button>
     <div class="faq-a">Yes! Tempest is built with a REST API first approach. Check out the <a href="{% url 'api_reference' %}">API Reference</a> for more details and documentation.</div>
+  </div>
+</section>
+
+<section class="about-section">
+  <p class="about-badge">Built in Ghana.</p>
+  <h2 class="about-title">The Person Behind Tempest</h2>
+  <p class="section-sub" style="margin-bottom: 40px; max-width: 500px;">One person obsessed with making work simpler for everyone.</p>
+  
+  <div class="about-card">
+    <div class="about-avatar">S</div>
+    <div class="about-name">Kimathi Sedegah</div>
+    <div class="about-role">Founder &amp; CEO</div>
+    <div class="about-bio">
+      Built Tempest from the ground up — product, design, and engineering. Focused on making every seller's experience as smooth as possible.
+    </div>
   </div>
 </section>
 
