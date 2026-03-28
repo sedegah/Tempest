@@ -8,22 +8,31 @@
   .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(76,202,122,0.1) 0%, transparent 70%); pointer-events: none; }
   
   .features-container { max-width: 1300px; margin: 0 auto; padding: 40px 44px 100px; }
-  .features-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
-  .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 48px; display: flex; flex-direction: column; gap: 24px; transition: border-color 0.3s, transform 0.3s; flex: 1 1 400px; max-width: 600px; }
-  .feat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
   
-  .feat-visual { height: 200px; border-radius: 18px; margin-bottom: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); overflow: hidden; }
-  .feat-visual .icon { width: 44px; height: 44px; color: var(--accent); position: relative; z-index: 1; }
+  .feat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 28px; text-decoration: none; color: inherit; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 480px; }
+  .feat-card:hover { transform: translateY(-6px); border-color: rgba(240,201,58,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 
-  .feat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-  .feat-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; color: var(--muted); letter-spacing: 0.05em; }
+  .feat-card-bg { position: absolute; inset: 0; z-index: 0; opacity: 0.3; transition: opacity 0.5s ease, transform 0.5s ease; width: 100%; height: 100%; }
+  .feat-card:hover .feat-card-bg { opacity: 0.6; transform: scale(1.03); }
+  .feat-card-bg::after { content:''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--surface2) 100%); }
+
+  .feat-card-content { position: relative; z-index: 10; padding: 48px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 40px; }
+
+  .feat-icon-wrap { width: 64px; height: 64px; border-radius: 18px; background: rgba(7, 9, 15, 0.6); border: 1px solid rgba(240,201,58,0.15); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: transform 0.4s, border-color 0.4s; }
+  .feat-icon-wrap .icon { width: 30px; height: 30px; color: var(--accent); }
+  .feat-card:hover .feat-icon-wrap { transform: scale(1.1); border-color: rgba(240,201,58,0.4); }
+
+  .feat-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: auto; }
+  .feat-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; background: var(--surface); border: 1px solid var(--border); padding: 8px 16px; border-radius: 999px; color: var(--accent); letter-spacing: 0.12em; }
   
-  .feat-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); }
-  .feat-desc { color: var(--muted); font-size: 16px; line-height: 1.7; }
+  .feat-card-body { margin-top: auto; }
+  .feat-name { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 16px; letter-spacing: -0.01em; }
+  .feat-desc { color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 95%; }
   
-  .feat-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
-  .feat-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text); font-weight: 600; }
-  .feat-list li i { width: 16px; height: 16px; color: var(--green); }
+  .feat-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--border); }
+  .feat-list li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text); font-weight: 600; }
+  .feat-list li i { width: 18px; height: 18px; color: var(--accent); }
 
   @media (max-width: 900px) {
     .features-grid { grid-template-columns: 1fr; }
@@ -42,51 +51,79 @@
 <div class="features-container">
   <div class="features-grid">
     <div class="feat-card">
-      <div class="feat-visual pattern-viz pattern-geometric"><div class="shape-1"></div><i data-lucide="shield-check" class="icon"></i></div>
-      <div class="feat-card-top"><span class="feat-badge">Standard</span></div>
-      <div class="feat-name">AES-256 Encryption</div>
-      <div class="feat-desc">Military-grade encryption ensures that your files are unreadable to anyone without the original password. We never store your keys.</div>
-      <ul class="feat-list">
-        <li><i data-lucide="check" class="icon"></i> Industry-standard Fernet (AES-256)</li>
-        <li><i data-lucide="check" class="icon"></i> Zero-knowledge architecture</li>
-        <li><i data-lucide="check" class="icon"></i> Optional password protection</li>
-      </ul>
+      <div class="feat-card-bg pattern-viz pattern-geometric"><div class="shape-1"></div></div>
+      <div class="feat-card-content">
+        <div class="feat-card-top">
+          <div class="feat-icon-wrap"><i data-lucide="shield-check" class="icon"></i></div>
+          <span class="feat-badge">Standard</span>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-name">AES-256 Encryption</div>
+          <div class="feat-desc">Military-grade encryption ensures that your files are unreadable to anyone without the original password. We never store your keys.</div>
+          <ul class="feat-list">
+            <li><i data-lucide="check" class="icon"></i> Industry-standard Fernet (AES-256)</li>
+            <li><i data-lucide="check" class="icon"></i> Zero-knowledge architecture</li>
+            <li><i data-lucide="check" class="icon"></i> Optional password protection</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="feat-card">
-      <div class="feat-visual pattern-viz pattern-fiery"><div class="shape-1"></div><div class="shape-2"></div><div class="shape-3"></div><i data-lucide="flame" class="icon"></i></div>
-      <div class="feat-card-top"><span class="feat-badge">Standard</span></div>
-      <div class="feat-name">Ephemeral Links</div>
-      <div class="feat-desc">Files automatically self-destruct based on your rules. Once deleted, they are purged from both storage and the database permanently.</div>
-      <ul class="feat-list">
-        <li><i data-lucide="check" class="icon"></i> Customizable expiry (1h - 7d)</li>
-        <li><i data-lucide="check" class="icon"></i> One-time download limits</li>
-        <li><i data-lucide="check" class="icon"></i> Automatic cleanup via Celery</li>
-      </ul>
+      <div class="feat-card-bg pattern-viz pattern-fiery"><div class="shape-1"></div><div class="shape-2"></div><div class="shape-3"></div></div>
+      <div class="feat-card-content">
+        <div class="feat-card-top">
+          <div class="feat-icon-wrap"><i data-lucide="flame" class="icon"></i></div>
+          <span class="feat-badge">Standard</span>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-name">Ephemeral Links</div>
+          <div class="feat-desc">Files automatically self-destruct based on your rules. Once deleted, they are purged from both storage and the database permanently.</div>
+          <ul class="feat-list">
+            <li><i data-lucide="check" class="icon"></i> Customizable expiry (1h - 7d)</li>
+            <li><i data-lucide="check" class="icon"></i> One-time download limits</li>
+            <li><i data-lucide="check" class="icon"></i> Automatic cleanup via Celery</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="feat-card">
-      <div class="feat-visual pattern-viz pattern-waves"><div class="shape-1"></div><div class="shape-2"></div><i data-lucide="cloud" class="icon"></i></div>
-      <div class="feat-card-top"><span class="feat-badge">Infrastructure</span></div>
-      <div class="feat-name">Edge Storage</div>
-      <div class="feat-desc">Leveraging Cloudflare R2 for globally distributed file storage with no egress fees and high durability.</div>
-      <ul class="feat-list">
-        <li><i data-lucide="check" class="icon"></i> High-performance object storage</li>
-        <li><i data-lucide="check" class="icon"></i> Geographically distributed</li>
-        <li><i data-lucide="check" class="icon"></i> Scalable up to 50MB per file</li>
-      </ul>
+      <div class="feat-card-bg pattern-viz pattern-waves"><div class="shape-1"></div><div class="shape-2"></div></div>
+      <div class="feat-card-content">
+        <div class="feat-card-top">
+          <div class="feat-icon-wrap"><i data-lucide="cloud" class="icon"></i></div>
+          <span class="feat-badge">Infrastructure</span>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-name">Edge Storage</div>
+          <div class="feat-desc">Leveraging Cloudflare R2 for globally distributed file storage with no egress fees and high durability.</div>
+          <ul class="feat-list">
+            <li><i data-lucide="check" class="icon"></i> High-performance object storage</li>
+            <li><i data-lucide="check" class="icon"></i> Geographically distributed</li>
+            <li><i data-lucide="check" class="icon"></i> Scalable up to 50MB per file</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div class="feat-card">
-      <div class="feat-visual pattern-viz pattern-ocean"><div class="shape-1"></div><div class="shape-2"></div><i data-lucide="activity" class="icon"></i></div>
-      <div class="feat-card-top"><span class="feat-badge">Security</span></div>
-      <div class="feat-name">Verifiable Auditing</div>
-      <div class="feat-desc">Complete visibility into your file's lifecycle. Track every access attempt and the final deletion event.</div>
-      <ul class="feat-list">
-        <li><i data-lucide="check" class="icon"></i> Real-time access logging</li>
-        <li><i data-lucide="check" class="icon"></i> Failed attempt lockouts</li>
-        <li><i data-lucide="check" class="icon"></i> Guaranteed deletion confirmation</li>
-      </ul>
+      <div class="feat-card-bg pattern-viz pattern-ocean"><div class="shape-1"></div><div class="shape-2"></div></div>
+      <div class="feat-card-content">
+        <div class="feat-card-top">
+          <div class="feat-icon-wrap"><i data-lucide="activity" class="icon"></i></div>
+          <span class="feat-badge">Security</span>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-name">Verifiable Auditing</div>
+          <div class="feat-desc">Complete visibility into your file's lifecycle. Track every access attempt and the final deletion event.</div>
+          <ul class="feat-list">
+            <li><i data-lucide="check" class="icon"></i> Real-time access logging</li>
+            <li><i data-lucide="check" class="icon"></i> Failed attempt lockouts</li>
+            <li><i data-lucide="check" class="icon"></i> Guaranteed deletion confirmation</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </div>
