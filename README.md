@@ -34,7 +34,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/sedegahkim/tempest.git
+git clone https://github.com/sedegah/tempest.git
 cd tempest
 ```
 
@@ -84,4 +84,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 Built by **sedegahkim** - [sedegahkim@gmail.com](mailto:sedegahkim@gmail.com)
 
-Project Link: [https://github.com/sedegahkim/tempest](https://github.com/sedegahkim/tempest)
+Project Link: [https://github.com/sedegah/tempest](https://github.com/sedegah/tempest)

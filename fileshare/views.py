@@ -103,40 +103,27 @@ def upload_view(request):
             expires_at = timezone.now() + timedelta(hours=expires_in_hours)
             
             uploaded_files = request.FILES.getlist('file')
-            
-            encryption_key = None
             encrypt = form.cleaned_data.get('encrypt', False)
             
-            if len(uploaded_files) > 1:
-                import io
-                import zipfile
-                
-                zip_buffer = io.BytesIO()
-                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    for uf in uploaded_files:
-                        uf.seek(0)
-                        zip_file.writestr(uf.name, uf.read())
-                
-                zip_buffer.seek(0)
-                
+            # Save files to a temporary directory for Celery
+            temp_dir = os.path.join(settings.BASE_DIR, 'tmp', f'upload_{file_id}')
+            os.makedirs(temp_dir, exist_ok=True)
+            
+            temp_file_paths = []
+            for uf in uploaded_files:
+                tfp = os.path.join(temp_dir, uf.name)
+                with open(tfp, 'wb+') as dest:
+                    for chunk in uf.chunks():
+                        dest.write(chunk)
+                temp_file_paths.append(tfp)
+            
+            is_multiple = len(uploaded_files) > 1
+            if is_multiple:
                 original_name = "Archive.zip"
                 file_name = f"{file_id}_Archive.zip"
-                
-                if encrypt:
-                    encrypted_data, encryption_key = encrypt_file(zip_buffer)
-                    StorageInterface.upload_file(file_name, encrypted_data)
-                else:
-                    StorageInterface.upload_file(file_name, zip_buffer.read())
             else:
-                uploaded_file = uploaded_files[0]
-                original_name = uploaded_file.name
-                file_name = f"{file_id}_{uploaded_file.name}"
-                
-                if encrypt:
-                    encrypted_data, encryption_key = encrypt_file(uploaded_file)
-                    StorageInterface.upload_file(file_name, encrypted_data)
-                else:
-                    StorageInterface.upload_file(file_name, uploaded_file.read())
+                original_name = uploaded_files[0].name
+                file_name = f"{file_id}_{original_name}"
 
             shared_file = SharedFile(
                 id=file_id,
@@ -146,8 +133,8 @@ def upload_view(request):
                 uploaded_at=timezone.now(),
                 expires_at=expires_at,
                 max_downloads=form.cleaned_data.get('max_downloads', 1),
-                download_count=0,
-                encryption_key=encryption_key,
+                download_count=-1, # -1 indicates the file is still processing in background
+                encryption_key=None,
                 password=hashed_password
             )
             
@@ -160,6 +147,18 @@ def upload_view(request):
                 expires_at=shared_file.expires_at
             )
             ShortLinkDBInterface.create_short_link(short_link)
+            
+            # Dispatch Celery task
+            from .tasks import process_upload_task
+            process_upload_task.delay(
+                file_id, 
+                temp_file_paths, 
+                encrypt, 
+                is_multiple, 
+                original_name, 
+                file_name, 
+                temp_dir
+            )
             
             secure_token = get_obfuscated_token(shared_file.token)
             return redirect('success', token=secure_token, original_uuid=shared_file.id)
@@ -203,6 +202,10 @@ def download_view(request, token, original_uuid):
     if file_expired_reason:
         DBInterface.log_access(shared_file, get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), "expired")
         return render(request, 'link_expired.html', {"reason": file_expired_reason}, status=410)
+
+    # Check if file is still processing
+    if shared_file.download_count == -1:
+        return render(request, 'processing.html', {'token': token, 'original_uuid': original_uuid})
 
     # Initial page load - no password challenge yet unless required
     if shared_file.password:
@@ -257,6 +260,10 @@ def perform_download(request, token, original_uuid):
     file_expired_reason = shared_file.get_expiration_reason()
     if file_expired_reason:
          return render(request, 'link_expired.html', {"reason": file_expired_reason}, status=410)
+
+    # Prevent download attempt if still processing in background
+    if shared_file.download_count == -1:
+         return redirect('download', token=token, original_uuid=original_uuid)
 
     if shared_file.password:
         if not request.session.get(f'auth_ok_{original_uuid}'):
