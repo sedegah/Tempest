@@ -15,4 +15,5 @@ urlpatterns = [
     path('terms/', views.terms_view, name='terms'),
     path('documentation/', views.documentation_view, name='documentation'),
     path('api-reference/', views.api_reference_view, name='api_reference'),
+    path('contact/', views.contact_view, name='contact'),
 ]

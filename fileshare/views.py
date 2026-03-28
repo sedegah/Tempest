@@ -59,6 +59,9 @@ def documentation_view(request):
 def api_reference_view(request):
     return render(request, 'api_reference.html')
 
+def contact_view(request):
+    return render(request, 'contact.html')
+
 def get_encryption_key(file_specific_key=None):
     if file_specific_key:
         return file_specific_key.encode('utf-8')
