@@ -78,7 +78,7 @@
           <div class="detail-grid">
             <div class="detail-cell"><div class="detail-label">File</div><div class="detail-value" style="word-break:break-all;">{{ file.display_name }}</div></div>
             <div class="detail-cell"><div class="detail-label">Encryption</div><div class="detail-value">{% if file.encryption_key %}AES-256{% else %}None{% endif %}</div></div>
-            <div class="detail-cell"><div class="detail-label">Downloads</div><div class="detail-value" style="color:var(--accent);">{{ file.download_count }} / {{ file.max_downloads }}</div></div>
+            <div class="detail-cell"><div class="detail-label">Downloads</div><div class="detail-value" style="color:var(--accent);">{% if file.download_count < 0 %}0{% else %}{{ file.download_count }}{% endif %} / {{ file.max_downloads }}</div></div>
             <div class="detail-cell"><div class="detail-label">Password</div><div class="detail-value">{% if file.password %}Protected{% else %}Open{% endif %}</div></div>
           </div>
         </div>
