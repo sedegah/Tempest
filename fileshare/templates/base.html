@@ -39,6 +39,12 @@
     html {
       scroll-behavior: smooth;
       zoom: 0.93;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
     }
 
     @-moz-document url-prefix() {
