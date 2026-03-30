@@ -3,6 +3,7 @@ import os
 import hashlib
 import uuid
 import secrets
+import threading
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.shortcuts import render, redirect
@@ -148,17 +149,23 @@ def upload_view(request):
             )
             ShortLinkDBInterface.create_short_link(short_link)
             
-            # Dispatch Celery task
+            # Run heavy processing (zip/encrypt/R2 upload) in a background thread
+            # so the request returns immediately — prevents timeouts on slow networks.
             from .tasks import process_upload_task
-            process_upload_task.delay(
-                file_id, 
-                temp_file_paths, 
-                encrypt, 
-                is_multiple, 
-                original_name, 
-                file_name, 
-                temp_dir
+            bg_thread = threading.Thread(
+                target=process_upload_task,
+                args=(
+                    file_id,
+                    temp_file_paths,
+                    encrypt,
+                    is_multiple,
+                    original_name,
+                    file_name,
+                    temp_dir,
+                ),
+                daemon=True,
             )
+            bg_thread.start()
             
             secure_token = get_obfuscated_token(shared_file.token)
             return redirect('success', token=secure_token, original_uuid=shared_file.id)
