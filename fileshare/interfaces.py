@@ -1,4 +1,3 @@
-# pyre-ignore-all-errors
 import os
 import uuid
 import json
