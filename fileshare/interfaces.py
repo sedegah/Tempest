@@ -58,8 +58,44 @@ class StorageInterface:
             return None
 
 class D1Client:
+    _test_conn = None
+
+    @classmethod
+    def get_test_connection(cls):
+        if cls._test_conn is None:
+            import sqlite3
+            cls._test_conn = sqlite3.connect(":memory:", check_same_thread=False)
+            cls._test_conn.row_factory = sqlite3.Row
+            schema_path = os.path.join(settings.BASE_DIR, 'schema.sql')
+            if os.path.exists(schema_path):
+                with open(schema_path, 'r') as f:
+                    cls._test_conn.executescript(f.read())
+        return cls._test_conn
+
+    @classmethod
+    def execute_test_query(cls, sql: str, params: list = None):
+        import sqlite3
+        conn = cls.get_test_connection()
+        cursor = conn.cursor()
+        cursor.execute(sql, params or [])
+        conn.commit()
+        try:
+            rows = cursor.fetchall()
+            results = [dict(row) for row in rows]
+        except sqlite3.ProgrammingError:
+            results = []
+        return {
+            "results": results,
+            "success": True,
+            "meta": {}
+        }
+
     @staticmethod
     def execute(sql: str, params: list = None):
+        import sys
+        if 'test' in sys.argv or getattr(settings, 'TESTING', False):
+            return D1Client.execute_test_query(sql, params)
+
         account_id = os.environ.get("CLOUDFLARE_R2_ACCOUNT_ID")
         database_id = os.environ.get("CLOUDFLARE_D1_DATABASE_ID", "2dd53748-6960-411a-ac3d-96f575645d1c")
         

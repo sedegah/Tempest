@@ -3,10 +3,12 @@ import uuid
 from django.shortcuts import redirect, render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.utils import timezone
+from django_ratelimit.decorators import ratelimit
 from .interfaces import ShortLinkDBInterface
 from fileshare.interfaces import DBInterface
 from fileshare.views import get_obfuscated_token
 
+@ratelimit(key='ip', rate='30/m', block=True)
 def short_redirect_view(request, code):
     """
     Resolves a short code to a real file download page.

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}429 - Too Many Requests | Tempest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .error-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .error-bg-glow {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(240, 201, 58, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .error-card {
+    background: rgba(14, 17, 24, 0.65);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 60px 40px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .error-icon-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(240, 201, 58, 0.08);
+    border: 1px solid rgba(240, 201, 58, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    box-shadow: 0 0 20px rgba(240, 201, 58, 0.1);
+    margin-bottom: 8px;
+  }
+
+  .error-code {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .error-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  .error-desc {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .error-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-wrapper">
+  <div class="error-bg-glow"></div>
+  <div class="error-card">
+    <div class="error-icon-box">
+      <i data-lucide="shield-alert" style="width: 36px; height: 36px;"></i>
+    </div>
+    <div>
+      <span class="error-code">Error 429</span>
+      <h2 class="error-title">Slowing Things Down</h2>
+    </div>
+    <p class="error-desc">
+      You are sending requests faster than our systems can handle. Please wait a minute or two before trying again.
+    </p>
+    <a href="{% url 'landing' %}" class="btn btn-primary error-action">
+      <i data-lucide="home" class="icon" style="width: 14px; height: 14px;"></i> Return Home
+    </a>
+  </div>
+</div>
+{% endblock %}
